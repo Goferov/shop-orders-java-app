@@ -9,20 +9,32 @@ public class Customer {
     private Address address;
     private Address deliveryAddress; // optional
 
+    public Customer(int id, String name, String lastname, String company, String nip) { //Address address, Address deliveryAddress
+        this.id = id;
+        this.name = name;
+        this.lastname = lastname;
+        this.company = company;
+        this.nip = nip;
+//        this.address = address;
+//        this.deliveryAddress = deliveryAddress;
+    }
+
+    public Customer(String name) { //Address address, Address deliveryAddress
+        this.name = name;
+//        this.address = address;
+//        this.deliveryAddress = deliveryAddress;
+    }
+
     public int getId() {
         return id;
     }
 
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) return true;
-//        if (obj == null || getClass() != obj.getClass()) return false;
-//        Customer customer = (Customer) obj;
-//        return id != null && id.equals(customer.id);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return id != null ? id.hashCode() : 0;
-//    }
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", firstName='" + name + '\'' +
+                ", lastName='" + lastname + '\'' +
+                '}';
+    }
 }
