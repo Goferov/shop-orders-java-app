@@ -6,4 +6,8 @@ public class ItemsList {
     private Double discount; // optional
     private double netTotal;
     private double grossTotal;
+
+    public int getId() {
+        return id;
+    }
 }

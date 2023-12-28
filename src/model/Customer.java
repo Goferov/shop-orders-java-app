@@ -8,4 +8,8 @@ public class Customer {
     private String nip; // optional
     private Address address;
     private Address deliveryAddress; // optional
+
+    public int getId() {
+        return id;
+    }
 }

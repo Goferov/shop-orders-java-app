@@ -7,4 +7,8 @@ public class Order {
     private List<ItemsList> ItemsList;
     private Customer client;
     private Address deliveryAddress;
+
+    public int getId() {
+        return id;
+    }
 }
