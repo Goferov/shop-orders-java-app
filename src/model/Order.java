@@ -5,6 +5,6 @@ public class Order {
     private int id;
     private Date date;
     private List<ItemsList> ItemsList;
-    private Client client;
+    private Customer client;
     private Address deliveryAddress;
 }
