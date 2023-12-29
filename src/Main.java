@@ -1,8 +1,13 @@
+import gui.MainGui;
+
+import javax.swing.*;
+
 public class Main  {
-    private static final String FILE_NAME = "customers.dat";
-
     public static void main(String[] args) {
-
+        SwingUtilities.invokeLater(() -> {
+            MainGui mainGui = new MainGui();
+            mainGui.setVisible(true);
+        });
     }
 
 }

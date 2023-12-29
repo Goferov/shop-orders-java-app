@@ -1,51 +1,57 @@
 package gui;
 
 import model.Customer;
-
+import service.CustomerService;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class CustomerGui extends JPanel {
-    private DefaultListModel<Customer> customerModel;
     private JList<Customer> customerList;
-    private JFrame frame;
+    private DefaultListModel<Customer> customerListModel;
+    private JButton addButton;
+    private JButton removeButton;
+    private CustomerService customerService;
 
     public CustomerGui() {
+        customerService = new CustomerService();
         setLayout(new BorderLayout());
 
-        customerModel = new DefaultListModel<>();
-        customerList = new JList<>(customerModel);
-        add(new JScrollPane(customerList), BorderLayout.CENTER);
+        customerListModel = new DefaultListModel<>();
+        for (Customer customer : customerService.getAllCustomers()) {
+            customerListModel.addElement(customer);
+        }
+        customerList = new JList<>(customerListModel);
+        customerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(customerList);
+        add(scrollPane, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel(new FlowLayout());
-        JButton addButton = new JButton("Dodaj Klienta");
-        JButton deleteButton = new JButton("Usuń Klienta");
+        addButton = new JButton("Dodaj klienta");
+        removeButton = new JButton("Usuń klienta");
 
         addButton.addActionListener(this::addCustomerAction);
-        deleteButton.addActionListener(this::deleteCustomerAction);
+        removeButton.addActionListener(this::removeCustomerAction);
 
-        bottomPanel.add(addButton);
-        bottomPanel.add(deleteButton);
-
-        add(bottomPanel, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void addCustomerAction(ActionEvent e) {
-        String name = JOptionPane.showInputDialog(frame, "Podaj imię :", "Nowy Klient", JOptionPane.PLAIN_MESSAGE);
+        String name = JOptionPane.showInputDialog(this, "Podaj nazwę klienta:");
         if (name != null && !name.trim().isEmpty()) {
-            Customer newCustomer = new Customer(name);
-            customerModel.addElement(newCustomer);
+            Customer customer = new Customer(name);
+            customerService.addCustomer(customer);
+            customerListModel.addElement(customer);
         }
     }
 
-    private void deleteCustomerAction(ActionEvent e) {
-        int selectedIndex = customerList.getSelectedIndex();
-        if (selectedIndex != -1) {
-            customerModel.remove(selectedIndex);
-        } else {
-            JOptionPane.showMessageDialog(frame, "Proszę wybrać klienta do usunięcia.", "Błąd", JOptionPane.ERROR_MESSAGE);
+    private void removeCustomerAction(ActionEvent e) {
+        Customer selectedCustomer = customerList.getSelectedValue();
+        if (selectedCustomer != null) {
+            customerService.removeCustomer(selectedCustomer.getId());
+            customerListModel.removeElement(selectedCustomer);
         }
     }
 }
-
