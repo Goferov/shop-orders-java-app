@@ -28,4 +28,8 @@ public class ValidatorUtil {
     public static boolean validateTextField(String text) {
         return text != null && !text.trim().isEmpty();
     }
+
+    public static boolean validateIntRange(int number, int min, int max) {
+        return number >= min && number <= max;
+    }
 }
