@@ -7,6 +7,23 @@ public class Customer implements Serializable {
     private int id;
     private String name;
     private String lastname;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public String getNip() {
+        return nip;
+    }
+
     private String company; // optional
     private String nip; // optional
     private Address address;
