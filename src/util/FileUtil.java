@@ -1,7 +1,4 @@
 package util;
-
-import model.Customer;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -7,6 +7,20 @@ public class Customer implements Serializable {
     private int id;
     private String name;
     private String lastname;
+    private String company; // optional
+    private String nip; // optional
+    private Address address;
+    private Address deliveryAddress; // optional
+
+    public Customer(int id, String name, String lastname, String company, String nip, Address address) { //, Address deliveryAddress
+        this.id = id;
+        this.name = name;
+        this.lastname = lastname;
+        this.company = company;
+        this.nip = nip;
+        this.address = address;
+//        this.deliveryAddress = deliveryAddress;
+    }
 
     public String getName() {
         return name;
@@ -22,21 +36,6 @@ public class Customer implements Serializable {
 
     public String getNip() {
         return nip;
-    }
-
-    private String company; // optional
-    private String nip; // optional
-    private Address address;
-    private Address deliveryAddress; // optional
-
-    public Customer(int id, String name, String lastname, String company, String nip) { //Address address, Address deliveryAddress
-        this.id = id;
-        this.name = name;
-        this.lastname = lastname;
-        this.company = company;
-        this.nip = nip;
-//        this.address = address;
-//        this.deliveryAddress = deliveryAddress;
     }
 
     public Customer(String name) { //Address address, Address deliveryAddress

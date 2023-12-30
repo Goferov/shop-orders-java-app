@@ -37,7 +37,7 @@ public class CustomerFormView extends JDialog {
         return idField.getText();
     }
 
-    public String getFirstNameField() {
+    public String getNameField() {
         return firstNameField.getText();
     }
 
@@ -45,7 +45,7 @@ public class CustomerFormView extends JDialog {
         return lastNameField.getText();
     }
 
-    public String getCompanyNameField() {
+    public String getCompanyField() {
         return companyNameField.getText();
     }
 
@@ -57,7 +57,7 @@ public class CustomerFormView extends JDialog {
         return streetField.getText();
     }
 
-    public String getBuildingNumberField() {
+    public String getHouseNumberField() {
         return buildingNumberField.getText();
     }
 
