@@ -8,6 +8,7 @@ import view.CustomerFormView;
 import view.CustomerView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class CustomerController {
         loadCustomers();
         view.setAddButtonAction(e -> showAddCustomerForm());
         view.setRemoveButtonAction(e -> removeCustomer());
+        view.setFilterButtonAction(e -> {});
         form.submitForm(e -> addCustomer());
         form.cancelForm(e -> cancelForm());
         form.showDeliveryPanelYes(e -> toggleDeliveryAddressFields(true));
@@ -44,6 +46,8 @@ public class CustomerController {
             }
         });
     }
+
+
 
 
     private void loadCustomers() {
@@ -75,7 +79,6 @@ public class CustomerController {
             details.append("Adres dostawy:\n").append(
                     customer.getDeliveryAddress() != null ? customer.getDeliveryAddress() : "Taki sam jak powyżej"
             ).append("\n\n");
-
 
             JOptionPane.showMessageDialog(view, details, "Szczegóły Klienta", JOptionPane.INFORMATION_MESSAGE);
         }

@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 public class CustomerView extends JPanel {
     private JButton addButton;
     private JButton removeButton;
+    private JButton filterButton;
     private final String[] columnNames = {"ID", "Imię", "Nazwisko", "Nazwa firmy", "NIP"};
     private DefaultTableModel tableModel;
     private JTable table;
@@ -24,11 +25,13 @@ public class CustomerView extends JPanel {
 
         addButton = new JButton("Dodaj");
         removeButton = new JButton("Usuń");
+        filterButton = new JButton("Filtruj");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
+        buttonPanel.add(filterButton);
 
         setLayout(new BorderLayout());
         add(listScrollPane, BorderLayout.CENTER);
@@ -44,6 +47,10 @@ public class CustomerView extends JPanel {
 
     public void setRemoveButtonAction(ActionListener action) {
         removeButton.addActionListener(action);
+    }
+
+    public void setFilterButtonAction(ActionListener action) {
+        filterButton.addActionListener(action);
     }
 
     public void setOnDoubleClickAction(MouseAdapter action) {
