@@ -5,17 +5,21 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class CustomerView extends JPanel {
     private JButton addButton;
     private JButton removeButton;
-    private final String[] columnNames = {"ID", "Imię", "Nazwisko"};
+    private final String[] columnNames = {"ID", "Imię", "Nazwisko", "Nazwa firmy", "NIP"};
     private DefaultTableModel tableModel;
     private JTable table;
 
     public CustomerView() {
         tableModel = new DefaultTableModel(columnNames, 0);
         table = new JTable(tableModel);
+
         JScrollPane listScrollPane = new JScrollPane(table);
 
         addButton = new JButton("Dodaj");
@@ -42,8 +46,12 @@ public class CustomerView extends JPanel {
         removeButton.addActionListener(action);
     }
 
+    public void setOnDoubleClickAction(MouseAdapter action) {
+        table.addMouseListener(action);
+    }
+
     public void addCustomerToView(Customer customer) {
-        tableModel.addRow(new Object[]{customer.getId(), customer.getName(), customer.getLastname()});
+        tableModel.addRow(new Object[]{customer.getId(), customer.getName(), customer.getLastname(), customer.getCompany(), customer.getNip()});
     }
 
     public void removeCustomerFromView(int customerId) {
@@ -58,9 +66,9 @@ public class CustomerView extends JPanel {
     public Integer getSelectedCustomer() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            return (int) (Integer) tableModel.getValueAt(selectedRow, 0);
+            return (Integer) tableModel.getValueAt(selectedRow, 0);
         }
-        return null; // lub zwrócić znalezionego klienta
+        return null;
     }
 
 }

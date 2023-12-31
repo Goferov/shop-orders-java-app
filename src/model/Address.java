@@ -20,4 +20,42 @@ public class Address implements Serializable {
         this.state = state;
         this.country = country;
     }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public String getHouseNumber() {
+        return houseNumber;
+    }
+
+    public String getApartmentNumber() {
+        return apartmentNumber;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+    @Override
+    public String toString() {
+        return "Ulica: " + street + '\n' +
+                "Numer budynku: " + houseNumber + '\n' +
+                "Numer mieszkania: " + (apartmentNumber.isEmpty() ? "N/A" : apartmentNumber) + '\n' +
+                "Miasto: " + city + '\n' +
+                "Kod pocztowy: " + postalCode + '\n' +
+                "Województwo: " + state + '\n' +
+                "Kraj: " + country + '\n';
+    }
 }
