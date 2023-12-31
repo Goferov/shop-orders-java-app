@@ -54,7 +54,7 @@ public class CustomerController {
 
     public void removeCustomer() {
         try {
-            customers.removeIf(c -> c.getId() == view.getSelectedCustomer().getId());
+            customers.removeIf(c -> c.getId() == view.getSelectedCustomer());
             view.removeCustomerFromView(view.getSelectedCustomer());
             saveCustomers();
         }
