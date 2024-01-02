@@ -56,7 +56,7 @@ public class CustomerController {
         }
     }
 
-    private int generateNextId() {
+    private int generateNextId() { //
         int maxId = customers.stream().mapToInt(Customer::getId).max().orElse(0);
         currentId = Math.max(currentId, maxId);
         return currentId + 1;
