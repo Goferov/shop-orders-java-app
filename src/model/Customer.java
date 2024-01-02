@@ -1,8 +1,7 @@
 package model;
 
-import java.io.Serializable;
 
-public class Customer implements Serializable {
+public class Customer extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private Integer id;
     private String name;

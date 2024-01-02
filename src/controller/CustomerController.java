@@ -2,125 +2,47 @@ package controller;
 
 import model.Address;
 import model.Customer;
-import util.FileUtil;
 import util.ValidatorUtil;
 import view.customer.CustomerFormView;
 import view.customer.CustomerView;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
-public class CustomerController {
-    private final CustomerView view;
-    private final CustomerFormView form;
+public class CustomerController extends AbstractController<Customer, CustomerView, CustomerFormView> {
     private static final String CUSTOMER_FILE = "customers.dat";
-//    private Database database; TODO: Połączenie z bazą danych
-    private List<Customer> customers;
-    private static int currentId = 0;
 
     public CustomerController(CustomerView view, CustomerFormView form) {
-        this.view = view;
-        this.form = form;
-        this.customers = new ArrayList<>();
-        loadCustomers();
-        view.addButtonAction(e -> showAddCustomerForm());
-        view.removeButtonAction(e -> removeCustomer());
-        view.filterButtonAction(e -> {});
-        form.submitForm(e -> addCustomer());
-        form.cancelForm(e -> cancelForm());
+        super(view, form, CUSTOMER_FILE);
         form.showDeliveryPanelYes(e -> toggleDeliveryAddressFields(true));
         form.showDeliveryPanelNo(e -> toggleDeliveryAddressFields(false));
-
-        view.doubleClickAction(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    Integer selectedRow = view.getSelectedElement();
-                    customerDetails(findCustomerById(selectedRow));
-                }
-            }
-        });
     }
 
-
-
-
-    private void loadCustomers() {
-        customers = FileUtil.loadFromFile(CUSTOMER_FILE);
-        for(Customer customer : customers) {
-            view.addToView(customer);
-        }
-    }
-
-    private int generateNextId() { //
-        int maxId = customers.stream().mapToInt(Customer::getId).max().orElse(0);
-        currentId = Math.max(currentId, maxId);
-        return currentId + 1;
-    }
-
-    private Customer findCustomerById(Integer id) {
-        Optional<Customer> customer = customers.stream().filter(c -> c.getId().equals(id)).findFirst();
-        return customer.orElse(null);
-    }
-
-    private void customerDetails(Customer customer) {
-        if(customer != null) {
-            StringBuilder details = new StringBuilder();
-            details.append("Imię: ").append(customer.getName()).append("\n");
-            details.append("Nazwisko: ").append(customer.getLastname()).append("\n");
-            details.append("Firma: ").append(customer.getCompany()).append("\n");
-            details.append("NIP: ").append(customer.getNip()).append("\n\n");
-            details.append("Adres:\n").append(customer.getAddress()).append("\n\n");
-            details.append("Adres dostawy:\n").append(
-                    customer.getDeliveryAddress() != null ? customer.getDeliveryAddress() : "Taki sam jak powyżej"
-            ).append("\n\n");
-
-            JOptionPane.showMessageDialog(view, details, "Szczegóły Klienta", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    private void saveCustomers() {
-        FileUtil.saveToFile(CUSTOMER_FILE, customers);
-    }
-
-    private void showAddCustomerForm() {
-        form.setVisible(true);
-    }
-
-    private void addCustomer() {
-        if(validateFormFields()) {
-            Customer customer = createNewCustomer();
-            customers.add(customer);
-            view.addToView(customer);
-            saveCustomers();
-            form.clearFormFields();
-            form.setVisible(false);
-        }
-    }
-
-    private void cancelForm() {
-        form.setVisible(false);
-    }
 
     private void toggleDeliveryAddressFields(boolean show) {
         form.getDeliveryAddressPanel().setVisible(show);
         form.pack();
     }
 
-    public void removeCustomer() {
-        Integer selectedCustomer = view.getSelectedElement();
-        if (selectedCustomer != null) {
-            customers.removeIf(c -> c.getId().equals(selectedCustomer));
-            view.removeFromView(selectedCustomer);
-            saveCustomers();
+
+    @Override
+    protected void showDetails(Customer element) {
+        if(element != null) {
+            StringBuilder details = new StringBuilder();
+            details.append("Imię: ").append(element.getName()).append("\n");
+            details.append("Nazwisko: ").append(element.getLastname()).append("\n");
+            details.append("Firma: ").append(element.getCompany()).append("\n");
+            details.append("NIP: ").append(element.getNip()).append("\n\n");
+            details.append("Adres:\n").append(element.getAddress()).append("\n\n");
+            details.append("Adres dostawy:\n").append(
+                    element.getDeliveryAddress() != null ? element.getDeliveryAddress() : "Taki sam jak powyżej"
+            ).append("\n\n");
+
+            JOptionPane.showMessageDialog(view, details, "Szczegóły Klienta", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    private Customer createNewCustomer() {
+    @Override
+    protected Customer create() {
         Address customerAddress = new Address(
                 form.getStreetField(),
                 form.getHouseNumberField(),
@@ -154,7 +76,7 @@ public class CustomerController {
         );
     }
 
-    private boolean validateFormFields() {
+    protected boolean validateFormFields() {
         boolean isValidate = true;
         StringBuilder errorMsg = new StringBuilder();
 

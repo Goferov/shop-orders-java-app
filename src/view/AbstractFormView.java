@@ -23,7 +23,7 @@ public abstract class AbstractFormView extends JDialog {
     }
 
     protected abstract void addFieldsToForm();
-    protected abstract void clearFormFields();
+    public abstract void clearFormFields();
 
     public void submitForm(ActionListener actionListener) {
         submitBtn.addActionListener(actionListener);
