@@ -1,4 +1,5 @@
 package controller;
 
-public class AbstractController {
+public abstract class AbstractController {
+    protected String FILE_NAME;
 }

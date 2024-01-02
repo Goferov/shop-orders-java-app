@@ -27,19 +27,19 @@ public class CustomerController {
         this.form = form;
         this.customers = new ArrayList<>();
         loadCustomers();
-        view.setAddButtonAction(e -> showAddCustomerForm());
-        view.setRemoveButtonAction(e -> removeCustomer());
-        view.setFilterButtonAction(e -> {});
+        view.addButtonAction(e -> showAddCustomerForm());
+        view.removeButtonAction(e -> removeCustomer());
+        view.filterButtonAction(e -> {});
         form.submitForm(e -> addCustomer());
         form.cancelForm(e -> cancelForm());
         form.showDeliveryPanelYes(e -> toggleDeliveryAddressFields(true));
         form.showDeliveryPanelNo(e -> toggleDeliveryAddressFields(false));
 
-        view.setOnDoubleClickAction(new MouseAdapter() {
+        view.doubleClickAction(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    Integer selectedRow = view.getSelectedCustomer();
+                    Integer selectedRow = view.getSelectedElement();
                     customerDetails(findCustomerById(selectedRow));
                 }
             }
@@ -52,7 +52,7 @@ public class CustomerController {
     private void loadCustomers() {
         customers = FileUtil.loadFromFile(CUSTOMER_FILE);
         for(Customer customer : customers) {
-            view.addCustomerToView(customer);
+            view.addToView(customer);
         }
     }
 
@@ -95,7 +95,7 @@ public class CustomerController {
         if(validateFormFields()) {
             Customer customer = createNewCustomer();
             customers.add(customer);
-            view.addCustomerToView(customer);
+            view.addToView(customer);
             saveCustomers();
             form.clearFormFields();
             form.setVisible(false);
@@ -112,10 +112,10 @@ public class CustomerController {
     }
 
     public void removeCustomer() {
-        Integer selectedCustomer = view.getSelectedCustomer();
+        Integer selectedCustomer = view.getSelectedElement();
         if (selectedCustomer != null) {
             customers.removeIf(c -> c.getId().equals(selectedCustomer));
-            view.removeCustomerFromView(selectedCustomer);
+            view.removeFromView(selectedCustomer);
             saveCustomers();
         }
     }
