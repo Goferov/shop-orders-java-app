@@ -1,4 +1,4 @@
-package view;
+package view.customer;
 
 import model.Customer;
 import javax.swing.*;

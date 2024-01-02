@@ -4,11 +4,10 @@ import model.Address;
 import model.Customer;
 import util.FileUtil;
 import util.ValidatorUtil;
-import view.CustomerFormView;
-import view.CustomerView;
+import view.customer.CustomerFormView;
+import view.customer.CustomerView;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
