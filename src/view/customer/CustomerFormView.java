@@ -1,15 +1,14 @@
 package view.customer;
 
+import view.AbstractFormView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class CustomerFormView extends JDialog {
+public class CustomerFormView extends AbstractFormView {
     private JTextField firstNameField = new JTextField();
     private JTextField lastNameField = new JTextField();
-
-
-
     private JTextField companyNameField = new JTextField();
     private JTextField nipField = new JTextField();
     private JTextField streetField = new JTextField();
@@ -19,9 +18,6 @@ public class CustomerFormView extends JDialog {
     private JTextField postalCodeField = new JTextField();
     private JTextField stateField = new JTextField();
     private JTextField countryField = new JTextField();
-
-    private JButton submitBtn = new JButton("Send");
-    private JButton cancelBtn = new JButton("Cancel");
 
     private JRadioButton deliveryAddressYes = new JRadioButton("Tak");
     private JRadioButton deliveryAddressNo = new JRadioButton("Nie", true);
@@ -39,13 +35,10 @@ public class CustomerFormView extends JDialog {
     private JPanel deliveryAddressPanel = new JPanel(new GridLayout(0, 2));
 
     public CustomerFormView(Frame parent) {
-        super(parent, "Enter Customer Details", true);
-        getContentPane().setLayout(new BorderLayout());
-
+        super(parent, "Enter Customer Details");
         addFieldsToForm();
         addDeliveryAddressFields();
         addDeliveryOptionToForm();
-        addBtnsToForm();
         pack();
         setLocationRelativeTo(parent);
     }
@@ -155,17 +148,7 @@ public class CustomerFormView extends JDialog {
         formPanel.add(stateField);
         formPanel.add(new JLabel("Country:"));
         formPanel.add(countryField);
-        formPanel.add(submitBtn);
-        formPanel.add(cancelBtn);
         getContentPane().add(formPanel, BorderLayout.CENTER);
-    }
-
-    public void addBtnsToForm() {
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.add(submitBtn);
-        buttonPanel.add(cancelBtn);
-        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
     }
 
     public void addDeliveryOptionToForm() {
@@ -229,14 +212,6 @@ public class CustomerFormView extends JDialog {
         deliveryPostalCodeField.setText("");
         deliveryStateField.setText("");
         deliveryCountryField.setText("");
-    }
-
-    public void submitForm(ActionListener actionListener) {
-        submitBtn.addActionListener(actionListener);
-    }
-
-    public void cancelForm(ActionListener actionListener) {
-        cancelBtn.addActionListener(actionListener);
     }
 
     public void showDeliveryPanelYes(ActionListener actionListener) {

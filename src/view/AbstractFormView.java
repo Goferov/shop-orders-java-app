@@ -11,10 +11,7 @@ public abstract class AbstractFormView extends JDialog {
     public AbstractFormView(Frame parent, String title) {
         super(parent, title, true);
         getContentPane().setLayout(new BorderLayout());
-
         addBtnsToForm();
-//        pack();
-//        setLocationRelativeTo(parent);
     }
 
     public void addBtnsToForm() {
