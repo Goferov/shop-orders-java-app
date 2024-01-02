@@ -4,14 +4,17 @@ package controller;
 import view.customer.CustomerFormView;
 import view.customer.CustomerView;
 import view.MainView;
+import view.product.ProductFormView;
 import view.product.ProductView;
 
 public class MainController {
     private MainView mainView;
     private CustomerController customerController;
+    private ProductController productController;
     private CustomerView customerView;
     private ProductView productView;
     private CustomerFormView customerForm;
+    private ProductFormView productFormView;
 
     public MainController() {
         mainView = new MainView();
@@ -22,6 +25,8 @@ public class MainController {
         mainView.addTab("Klienci", customerView);
 
         productView = new ProductView();
+        productFormView = new ProductFormView(mainView);
+        productController = new ProductController(productView, productFormView);
          mainView.addTab("Produkty", productView);
         // mainView.addTab("Zamówienia", new CustomerView());
 

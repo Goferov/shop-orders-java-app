@@ -1,7 +1,6 @@
 package model;
 
-public class Product {
-    private Integer id;
+public class Product extends AbstractModel {
     private String name;
     private String description; // optional
     private String sku;
@@ -11,9 +10,6 @@ public class Product {
     private Double weight; // optional
 
 
-    public Integer getId() {
-        return id;
-    }
     public String getName() {
         return name;
     }
