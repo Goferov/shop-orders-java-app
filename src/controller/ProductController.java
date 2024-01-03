@@ -2,18 +2,49 @@ package controller;
 
 import model.Dimensions;
 import model.Product;
-import util.FileUtil;
 import util.ValidatorUtil;
 import view.product.ProductFormView;
 import view.product.ProductView;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.math.BigDecimal;
 
 public class ProductController extends AbstractController <Product, ProductView, ProductFormView>{
 
     public ProductController(ProductView view, ProductFormView form) {
         super(view, form, "products.dat");
+
+        view.searchAction(new DocumentListener() {
+            public void updateSearch(DocumentEvent e) {
+                search(view.getFilterField().getText());
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateSearch(e);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateSearch(e);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateSearch(e);
+            }
+        });
+
+    }
+
+    private void search(String str) {
+        if (str.isEmpty()) {
+            view.getSorter().setRowFilter(null);
+        } else {
+            view.getSorter().setRowFilter(RowFilter.regexFilter("(?i)" + str, 1));
+        }
     }
 
     @Override
