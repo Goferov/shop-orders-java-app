@@ -77,8 +77,6 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
     }
 
     protected boolean validateFormFields() {
-        boolean isValidate = true;
-        StringBuilder errorMsg = new StringBuilder();
 
         if(!ValidatorUtil.validateTextField(form.getNameField())) {
             errorMsg.append("Imię jest wymagane.\n");

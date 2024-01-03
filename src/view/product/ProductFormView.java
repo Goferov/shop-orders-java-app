@@ -11,7 +11,7 @@ public class ProductFormView extends AbstractFormView {
     private JTextArea descriptionArea = new JTextArea();
     private JTextField skuField = new JTextField();
     private JTextField netPriceField = new JTextField();
-    private JTextField grossPriceField = new JTextField();
+    private JTextField taxField = new JTextField();
     private JTextField lengthField = new JTextField();
     private JTextField widthField = new JTextField();
     private JTextField heightField = new JTextField();
@@ -40,8 +40,8 @@ public class ProductFormView extends AbstractFormView {
         return netPriceField.getText();
     }
 
-    public String getGrossPriceField() {
-        return grossPriceField.getText();
+    public String getTaxField() {
+        return taxField.getText();
     }
 
     public String getLengthField() {
@@ -72,15 +72,15 @@ public class ProductFormView extends AbstractFormView {
         formPanel.add(skuField);
         formPanel.add(new JLabel("Cena NETTO:"));
         formPanel.add(netPriceField);
-        formPanel.add(new JLabel("Cena BRUTTO"));
-        formPanel.add(grossPriceField);
-        formPanel.add(new JLabel("Długość (opcjonalnie):"));
+        formPanel.add(new JLabel("Podatek %:"));
+        formPanel.add(taxField);
+        formPanel.add(new JLabel("Długość cm (opcjonalnie):"));
         formPanel.add(lengthField);
-        formPanel.add(new JLabel("Szerokość (opcjonalnie):"));
+        formPanel.add(new JLabel("Szerokość cm (opcjonalnie):"));
         formPanel.add(widthField);
-        formPanel.add(new JLabel("Wysokość (opcjonalnie):"));
+        formPanel.add(new JLabel("Wysokość cm (opcjonalnie):"));
         formPanel.add(heightField);
-        formPanel.add(new JLabel("Waga (Optional):"));
+        formPanel.add(new JLabel("Waga kg (opcjonalnie):"));
         formPanel.add(weightField);
         getContentPane().add(formPanel, BorderLayout.CENTER);
     }
@@ -91,7 +91,7 @@ public class ProductFormView extends AbstractFormView {
         descriptionArea.setText("");
         skuField.setText("");
         netPriceField.setText("");
-        grossPriceField.setText("");
+        taxField.setText("");
         lengthField.setText("");
         widthField .setText("");
         heightField.setText("");

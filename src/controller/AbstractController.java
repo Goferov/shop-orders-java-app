@@ -16,6 +16,8 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
     private final String dataFile;
     private List<T> dataList;
     private static int currentId = 0;
+    protected boolean isValidate = true;
+    protected StringBuilder errorMsg = new StringBuilder();
 
     protected AbstractController(TView view, TForm form, String dataFile) {
         this.view = view;
@@ -78,6 +80,9 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
             form.clearFormFields();
             form.setVisible(false);
         }
+        errorMsg.setLength(0);
+        isValidate = true;
+
     }
 
     public void remove() {

@@ -2,8 +2,6 @@ package model;
 
 
 public class Customer extends AbstractModel {
-    private static final long serialVersionUID = 1L;
-    private Integer id;
     private String name;
     private String lastname;
     private String company; // optional
@@ -11,8 +9,8 @@ public class Customer extends AbstractModel {
     private Address address;
     private Address deliveryAddress; // optional
 
-    public Customer(int id, String name, String lastname, String company, String nip, Address address, Address deliveryAddress) {
-        this.id = id;
+    public Customer(Integer id, String name, String lastname, String company, String nip, Address address, Address deliveryAddress) {
+        super(id);
         this.name = name;
         this.lastname = lastname;
         this.company = company;
@@ -45,9 +43,6 @@ public class Customer extends AbstractModel {
         return deliveryAddress;
     }
 
-    public Integer getId() {
-        return id;
-    }
 
     @Override
     public String toString() {
