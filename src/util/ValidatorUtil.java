@@ -2,6 +2,8 @@ package util;
 
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 public class ValidatorUtil {
@@ -84,6 +86,19 @@ public class ValidatorUtil {
             return 3;
         } catch (NumberFormatException e) {
             return 2;
+        }
+    }
+
+    public static boolean validateDate(String date, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        sdf.setLenient(false);
+
+        try {
+            sdf.parse(date);
+            return true;
+        }
+        catch (Exception e) {
+            return false;
         }
     }
 }

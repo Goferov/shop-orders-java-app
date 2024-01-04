@@ -76,7 +76,7 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         );
     }
 
-    protected boolean validateFormFields() {
+    protected void validateFormFields() {
 
         if(!ValidatorUtil.validateTextField(form.getNameField())) {
             errorMsg.append("Imię jest wymagane.\n");
@@ -147,14 +147,6 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
                 errorMsg.append("Adres dostawy - kraj jest wymagany.\n");
             }
         }
-
-
-        if(!errorMsg.isEmpty()) {
-            isValidate = false;
-            JOptionPane.showMessageDialog(this.form, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-        return isValidate;
     }
 
 }

@@ -115,7 +115,7 @@ public class ProductController extends AbstractController <Product, ProductView,
     }
 
     @Override
-    protected boolean validateFormFields() {
+    protected void validateFormFields() {
 
         System.out.println(form.getNameField());
         if(!ValidatorUtil.validateTextField(form.getNameField())) {
@@ -161,13 +161,5 @@ public class ProductController extends AbstractController <Product, ProductView,
             case 2:
                 errorMsg.append("Waga nie jest liczbą.\n");
         }
-
-
-        if(!errorMsg.isEmpty()) {
-            JOptionPane.showMessageDialog(this.form, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
     }
 }

@@ -68,6 +68,7 @@ public class ProductFormView extends AbstractFormView {
         formPanel.add(nameField);
         formPanel.add(new JLabel("Opis (opcjonalnie):"));
         formPanel.add(descriptionArea);
+        formPanel.add(new JScrollPane(descriptionArea));
         formPanel.add(new JLabel("SKU:"));
         formPanel.add(skuField);
         formPanel.add(new JLabel("Cena NETTO:"));

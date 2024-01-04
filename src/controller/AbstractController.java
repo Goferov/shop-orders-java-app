@@ -5,8 +5,10 @@ import util.FileUtil;
 import view.AbstractFormView;
 import view.AbstractView;
 
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +63,7 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
 
     protected abstract void showDetails(T element);
     protected abstract T create();
-    protected abstract boolean validateFormFields();
+    protected abstract void validateFormFields();
 
     private void saveToFile() {
         FileUtil.saveToFile(dataFile, dataList);
@@ -71,8 +73,17 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
         form.setVisible(true);
     }
 
+    private boolean isValidate() {
+        validateFormFields();
+        if(!errorMsg.isEmpty()) {
+            JOptionPane.showMessageDialog(this.form, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
     private void add() {
-        if(validateFormFields()) {
+        if(isValidate()) {
             T element = create();
             dataList.add(element);
             view.addToView(element);
