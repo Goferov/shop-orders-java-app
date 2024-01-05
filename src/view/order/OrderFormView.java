@@ -9,9 +9,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.List;
 import java.awt.*;
-
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 
 public class OrderFormView extends AbstractFormView {
 
@@ -19,7 +22,11 @@ public class OrderFormView extends AbstractFormView {
 
     private JComboBox<Customer> customerComboBox = new JComboBox<>();
     private JTable productTable;
-    JButton selectButton = new JButton("Dodaj");;
+    private DefaultTableModel productTableModel;
+    public JButton selectButton = new JButton("Dodaj");;
+    public JComboBox<Product> productComboBox = new JComboBox<>();
+    public JButton addButton = new JButton("Dodaj Produkt");
+    public JButton removeButton = new JButton("Usuń");
     private JTextField deliveryStreetField = new JTextField();
     private JTextField deliveryHouseNumberField = new JTextField();
     private JTextField deliveryApartmentNumberField = new JTextField();
@@ -41,8 +48,16 @@ public class OrderFormView extends AbstractFormView {
         return customerComboBox;
     }
 
+    public JComboBox<Product> getProductComboBox() {
+        return productComboBox;
+    }
+
     public JTable getProductTable() {
         return productTable;
+    }
+
+    public DefaultTableModel getproductTableModel() {
+        return productTableModel;
     }
 
     public JTextField getDeliveryStreetField() {
@@ -102,65 +117,98 @@ public class OrderFormView extends AbstractFormView {
         formPanel.add(deliveryStateField);
         formPanel.add(new JLabel("Adres dostawy - Country:"));
         formPanel.add(deliveryCountryField);
-
         getContentPane().add(formPanel, BorderLayout.CENTER);
 
-        JPanel formPanel2 = new JPanel(new BorderLayout());
+        // Product List
+        JPanel productPanel = new JPanel(new BorderLayout());
         String[] columnNames = {"ID Produktu", "Nazwa", "Cena", "Ilość", "Rabat", "Suma Netto", "Suma Brutto"};
-        DefaultTableModel tableModel = new DefaultTableModel(null, columnNames);
-        JTable orderTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(orderTable);
+        productTableModel = new DefaultTableModel(null, columnNames) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 3 || column == 4;
+            }
+        };
+        productTable = new JTable(productTableModel);
+        JScrollPane scrollPane = new JScrollPane(productTable);
+        productPanel.add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        productPanel.add(buttonPanel, BorderLayout.SOUTH);
+        getContentPane().add(productPanel, BorderLayout.EAST);
 
-        formPanel2.add(scrollPane, BorderLayout.CENTER);
-        JButton addButton = new JButton("Dodaj Produkt");
-        formPanel2.add(addButton, BorderLayout.SOUTH);
-        getContentPane().add(formPanel2, BorderLayout.EAST);
+        addActionToAddButton(e -> createDialogWithProductComboBox());
 
-        JComboBox<Product> productComboBox = new JComboBox<>();
+
 // Załaduj produkty do comboBoxa. Zakładamy, że masz metodę getProducts().
         List<Product> prods = FileUtil.loadFromFile("products.dat");
         for (Product product : prods) {
             productComboBox.addItem(product);
         }
 
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Utwórz okno dialogowe z comboBoxem
-                JDialog dialog = new JDialog();
-                dialog.setTitle("Wybierz produkt");
-                dialog.setLayout(new FlowLayout());
-                dialog.add(productComboBox);
 
-                dialog.add(selectButton);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-        });
 
         selectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Product selectedProduct = (Product) productComboBox.getSelectedItem();
                 if (selectedProduct != null) {
-                    // Dodaj produkt do tabeli
                     Object[] rowData = new Object[]{
                             selectedProduct.getId(),
                             selectedProduct.getName(),
-                            selectedProduct.getNetPrice(),
+                            selectedProduct.getGrossPrice(),
                             1,  // Domyślna ilość
                             0.0,  // Domyślny rabat
                             selectedProduct.getNetPrice(),  // Suma Netto
-                            0  // Suma Brutto //selectedProduct.getPrice() * (1 + selectedProduct.getTax()/100)
+                            selectedProduct.getGrossPrice() // Suma Brutto //selectedProduct.getPrice() * (1 + selectedProduct.getTax()/100)
                     };
-                    tableModel.addRow(rowData);
+                    productTableModel.addRow(rowData);
+                    productComboBox.removeItem(selectedProduct);
 
                 } else {
                     // Opcjonalnie: Pokaż wiadomość, jeśli żaden produkt nie został wybrany
                 }
             }
         });
+
+        productTableModel.addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+
+                // Sprawdź, czy zmieniona kolumna to 'Ilość' (indeks 3) lub 'Rabat' (indeks 4)
+                if (column == 3 || column == 4) {
+                    BigDecimal cenaBrutto = null;
+                    BigDecimal ilosc = null;
+                    BigDecimal rabat = null;
+
+                    try {
+                        cenaBrutto = new BigDecimal(productTableModel.getValueAt(row, 5).toString());
+                        ilosc = new BigDecimal(productTableModel.getValueAt(row, 3).toString());
+                        rabat = new BigDecimal(productTableModel.getValueAt(row, 4).toString());
+
+                        // Walidacja wartości
+                        if (ilosc.compareTo(BigDecimal.ZERO) <= 0) {
+                            JOptionPane.showMessageDialog(null, "Ilość musi być większa od 0.");
+                            return; // Przerwij dalsze wykonywanie, jeśli ilość nie jest prawidłowa
+                        }
+
+                        // Oblicz nową wartość sumy brutto
+                        BigDecimal nowaSumaBrutto = cenaBrutto.multiply(ilosc).multiply(BigDecimal.ONE.subtract(rabat));
+
+                        // Aktualizuj model tabeli
+                        productTableModel.setValueAt(nowaSumaBrutto, row, 2);
+                    } catch (NumberFormatException exception) {
+                        // Wyświetl wiadomość, jeśli podana wartość nie jest liczbą
+                        JOptionPane.showMessageDialog(null, "Podane wartości muszą być liczbami.");
+                    } catch (NullPointerException exception) {
+                        // Wyświetl wiadomość, jeśli którakolwiek z wartości jest null
+                        JOptionPane.showMessageDialog(null, "Wszystkie pola muszą być wypełnione.");
+                    }
+                }
+            }
+        });
+
 
     }
 
@@ -175,8 +223,27 @@ public class OrderFormView extends AbstractFormView {
         deliveryCountryField.setText("");
     }
 
+    private void createDialogWithProductComboBox() {
+        JDialog dialog = new JDialog(this, "Dodaj produkt do zamówienia", true);
+        dialog.setLayout(new FlowLayout());
+        dialog.add(productComboBox);
+
+        dialog.add(selectButton);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
     public void addActionToCustomerList(ActionListener actionListener) {
-        customerComboBox.addActionListener(actionListener);
+        addButton.addActionListener(actionListener);
+    }
+
+    private void addActionToAddButton(ActionListener actionListener) {
+        addButton.addActionListener(actionListener);
+    }
+
+    public void addActionToRemoveButton(ActionListener actionListener) {
+        removeButton.addActionListener(actionListener);
     }
 
 }

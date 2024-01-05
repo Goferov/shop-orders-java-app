@@ -10,7 +10,12 @@ import view.order.OrderFormView;
 import view.order.OrderView;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +28,9 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     protected OrderController(OrderView view, OrderFormView orderFormView) {
         super(view, orderFormView, "orders.dat");
         form.addActionToCustomerList(e -> updateDeliveryAddressFields());
+        form.addActionToRemoveButton(e -> removeProductFromOrderList());
         addCustomersToComboBox();
+
     }
 
     @Override
@@ -101,6 +108,36 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         if (!ValidatorUtil.validateTextField(form.getDeliveryCountryField().getText())) {
             errorMsg.append("Adres dostawy - kraj jest wymagany.\n");
         }
+
+        validateAndProcessProductTable();
+    }
+
+    private void validateAndProcessProductTable() {
+        DefaultTableModel tableModel = form.getproductTableModel();
+        for (int row = 0; row < tableModel.getRowCount(); row++) {
+            try {
+                // Pobierz wartości z wiersza
+                String productName = (String) tableModel.getValueAt(row, 1);
+                BigDecimal ilosc = new BigDecimal(tableModel.getValueAt(row, 3).toString());
+                BigDecimal rabat = new BigDecimal(tableModel.getValueAt(row, 4).toString());
+
+                // Walidacja wartości
+                if (ilosc.compareTo(BigDecimal.ZERO) <= 0) {
+                    errorMsg.append("Ilość musi być większa od 0: " + productName + ".\n");
+                    continue;  // Kontynuuj z następnym wierszem
+                }
+
+                if (rabat.compareTo(BigDecimal.ZERO) < 0) {
+                    errorMsg.append("Rabat musi być większy od 0: " + productName + ".\n");
+                    continue;  // Kontynuuj z następnym wierszem
+                }
+
+            } catch (NumberFormatException e) {
+                errorMsg.append("Wartości muszą być liczbami dla produktu: " + tableModel.getValueAt(row, 1) + ".\n");
+            } catch (NullPointerException e) {
+                errorMsg.append("Wszystkie pola muszą być wypełnione dla produktu: " + tableModel.getValueAt(row, 1) + ".\n");
+            }
+        }
     }
 
     private List<Customer> getCustomers() {
@@ -143,5 +180,26 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
             form.getDeliveryStateField().setText(addr.getState());
             form.getDeliveryCountryField().setText(addr.getCountry());
         }
+    }
+
+    private Integer getSelectedElementFromProductList() {
+        int selectedRow = form.getProductTable().getSelectedRow();
+        if (selectedRow >= 0) {
+            return (Integer) form.getproductTableModel().getValueAt(selectedRow, 0);
+        }
+        return null;
+    }
+
+    private void removeProductFromOrderList() {
+//        Integer selectedElement = getSelectedElementFromProductList();
+//        if (selectedElement != null) {
+//            for (int i = 0; i < form.getproductTableModel().getRowCount(); i++) {
+//                if (form.getproductTableModel().getValueAt(i, 0).equals(selectedElement)) {
+//                    form.getproductTableModel().removeRow(i);
+////                    form.getProductComboBox().
+//                    break;
+//                }
+//            }
+//        }
     }
 }
