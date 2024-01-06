@@ -1,9 +1,9 @@
 package view;
 
-import model.Customer;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,11 +14,13 @@ public abstract class AbstractView extends JPanel {
     protected JButton filterButton = new JButton("Filtruj");;
     public JTable table;
     public DefaultTableModel tableModel;
-
+    TableRowSorter<TableModel> sorter;
 
     public AbstractView(String[] columnNames) {
         tableModel = new DefaultTableModel(columnNames, 0);
         table = new JTable(tableModel);
+        sorter = new TableRowSorter<>(table.getModel());
+        table.setRowSorter(sorter);
         JScrollPane listScrollPane = new JScrollPane(table);
 
         JPanel buttonPanel = new JPanel();
@@ -67,5 +69,9 @@ public abstract class AbstractView extends JPanel {
             return (Integer) tableModel.getValueAt(selectedRow, 0);
         }
         return null;
+    }
+
+    public TableRowSorter<TableModel> getSorter() {
+        return sorter;
     }
 }

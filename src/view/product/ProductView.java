@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 
 public class ProductView extends AbstractView {
     JTextField filterField = new JTextField(15);
-    TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
 
     public ProductView() {
         super(new String[]{"ID", "Nazwa", "SKU", "Cena Netto", "Cena Brutto"});
@@ -21,16 +20,12 @@ public class ProductView extends AbstractView {
         filterPanel.add(new JLabel("Szukaj po nazwie:"));
         filterPanel.add(filterField);
         add(filterPanel, BorderLayout.NORTH);
-        table.setRowSorter(sorter);
     }
 
     public JTextField getFilterField() {
         return filterField;
     }
 
-    public TableRowSorter<TableModel> getSorter() {
-        return sorter;
-    }
 
     @Override
     public void addToView(Object o) {
