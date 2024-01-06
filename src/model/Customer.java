@@ -1,6 +1,8 @@
 package model;
 
 
+import java.util.Objects;
+
 public class Customer extends AbstractModel {
     private String name;
     private String lastname;
@@ -46,10 +48,27 @@ public class Customer extends AbstractModel {
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                ", firstName='" + name + '\'' +
-                ", lastName='" + lastname + '\'' +
-                '}';
+        return name + " " + lastname + " " + company + " " + nip;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Customer customer = (Customer) o;
+
+        return Objects.equals(getId(), customer.getId()) &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(lastname, customer.lastname) &&
+                Objects.equals(company, customer.company) &&
+                Objects.equals(nip, customer.nip) &&
+                Objects.equals(address, customer.address) &&
+                Objects.equals(deliveryAddress, customer.deliveryAddress);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), name, lastname, company, nip, address, deliveryAddress);
     }
 }

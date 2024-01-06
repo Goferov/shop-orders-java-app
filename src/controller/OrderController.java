@@ -1,47 +1,72 @@
 package controller;
 
-import model.Address;
-import model.Customer;
-import model.Order;
-import model.Product;
+import model.*;
+import util.DateTimeUtil;
 import util.FileUtil;
 import util.ValidatorUtil;
 import view.order.OrderFormView;
 import view.order.OrderView;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class OrderController extends AbstractController<Order, OrderView, OrderFormView> {
 
     private Customer selectedCustomer;
+    private Customer latestCustomer;
     private Date orderDate;
+    private int quantity;
+    private int discount;
+    private List<ItemsList> itemsList = new ArrayList<>();
 
     protected OrderController(OrderView view, OrderFormView orderFormView) {
         super(view, orderFormView, "orders.dat");
-        form.addActionToCustomerList(e -> updateDeliveryAddressFields());
+//        form.addActionToCustomerList(e -> updateDeliveryAddressFields());
         form.addActionToRemoveButton(e -> removeProductFromOrderList());
-        addCustomersToComboBox();
+        form.addActionToSelectButton(e -> addProductsToTable());
+        form.addActionToProductTableModel(this::calculateTotalSum);
+        form.addActionToAddButton(e -> updateAvailableProducts());
+        form.addActionToCustomerComboBox(new PopupMenuListener() {
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                addCustomersToComboBox();
+            }
 
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                updateDeliveryAddressFields();
+            }
+
+            public void popupMenuCanceled(PopupMenuEvent e) {}
+        });
     }
 
     @Override
     protected void showDetails(Order element) {
         if(element != null) {
             StringBuilder details = new StringBuilder();
+
             details.append("Identyfikator: \n").append(element.getId()).append("\n\n");
-            details.append("Data: \n").append(element.getDate()).append("\n\n");
+            details.append("Data: \n").append(DateTimeUtil.showDate(element.getDate())).append("\n\n");
             details.append("Klient: \n").append(element.getClient()).append("\n\n");
-            details.append("Produkty: \n").append("tu będzie lista produktów").append("\n\n");
-            details.append("Cena całkowita: \n").append(element.getOrderPrice()).append(" zł\n\n");
+            details.append("Produkty: \n");
+            details.append(String.format("%-10s %-30s %-10s %-10s %-15s %-15s\n", "ID", "Nazwa", "Ilość", "Rabat", "Netto", "Brutto"));
+            details.append("----------------------------------------------------------------------------------------\n");
+            for(ItemsList item : element.getItemsList()) {
+                details.append(String.format("%-10d %-30s %-10d %-10d %-15.2f %-15.2f\n",
+                        item.getId(),
+                        item.getName(),
+                        item.getQuantity(),
+                        item.getDiscount(),
+                        item.getNetTotal(),
+                        item.getGrossTotal()));
+            }
+            details.append("\n");
+            details.append("Cena całkowita: \n").append(element.getOrderTotalPrice()).append(" zł\n\n");
             details.append("Adres dostawy:\n").append(element.getDeliveryAddress()).append("\n\n");
 
             JOptionPane.showMessageDialog(view, details, "Szczegóły zamówienia", JOptionPane.INFORMATION_MESSAGE);
@@ -53,11 +78,12 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         return new Order(
                 generateNextId(),
                 orderDate,
-                null,
+                itemsList,
                 selectedCustomer,
                 createAddress()
         );
     }
+
 
     private Address createAddress() {
         return new Address(
@@ -114,23 +140,26 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
     private void validateAndProcessProductTable() {
         DefaultTableModel tableModel = form.getproductTableModel();
+        itemsList.clear();
         for (int row = 0; row < tableModel.getRowCount(); row++) {
             try {
-                // Pobierz wartości z wiersza
+                Integer productId = (Integer) tableModel.getValueAt(row, 0);;
                 String productName = (String) tableModel.getValueAt(row, 1);
-                BigDecimal ilosc = new BigDecimal(tableModel.getValueAt(row, 3).toString());
-                BigDecimal rabat = new BigDecimal(tableModel.getValueAt(row, 4).toString());
+                BigDecimal nettoPrice  = new BigDecimal(tableModel.getValueAt(row, 2).toString());
+                BigDecimal grossPrice = new BigDecimal(tableModel.getValueAt(row, 3).toString());
+                quantity = Integer.parseInt(tableModel.getValueAt(row, 4).toString());
+                discount = Integer.parseInt(tableModel.getValueAt(row, 5).toString());
 
-                // Walidacja wartości
-                if (ilosc.compareTo(BigDecimal.ZERO) <= 0) {
+                if (quantity <= 0) {
                     errorMsg.append("Ilość musi być większa od 0: " + productName + ".\n");
-                    continue;  // Kontynuuj z następnym wierszem
+                    continue;
                 }
 
-                if (rabat.compareTo(BigDecimal.ZERO) < 0) {
+                if (discount < 0 || discount > 100) {
                     errorMsg.append("Rabat musi być większy od 0: " + productName + ".\n");
-                    continue;  // Kontynuuj z następnym wierszem
                 }
+
+                addProductToItemList(productId, quantity, productName, discount, calculateTotal(nettoPrice, quantity), calculateTotal(grossPrice, quantity));
 
             } catch (NumberFormatException e) {
                 errorMsg.append("Wartości muszą być liczbami dla produktu: " + tableModel.getValueAt(row, 1) + ".\n");
@@ -138,6 +167,10 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
                 errorMsg.append("Wszystkie pola muszą być wypełnione dla produktu: " + tableModel.getValueAt(row, 1) + ".\n");
             }
         }
+    }
+
+    private void addProductToItemList(Integer id, int quantity, String name, int discount, BigDecimal netTotal, BigDecimal grossTotal) {
+        itemsList.add(new ItemsList(id, quantity, name, discount, netTotal, grossTotal));
     }
 
     private List<Customer> getCustomers() {
@@ -149,11 +182,21 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     }
 
     private void addCustomersToComboBox() {
+        form.getCustomerComboBox().removeAllItems();
         List<Customer> dataList = getCustomers();
         for(Customer customer : dataList) {
             form.getCustomerComboBox().addItem(customer);
         }
         form.getCustomerComboBox().setSelectedIndex(-1);
+
+        if (latestCustomer != null) {
+            for (int i = 0; i < form.getCustomerComboBox().getItemCount(); i++) {
+                if (form.getCustomerComboBox().getItemAt(i).equals(latestCustomer)) {
+                    form.getCustomerComboBox().setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
     }
 
     private void updateDeliveryAddressFields() {
@@ -162,8 +205,9 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         }
 
         selectedCustomer = (Customer) form.getCustomerComboBox().getSelectedItem();
+
         if (selectedCustomer != null) {
-            System.out.println(selectedCustomer);
+            latestCustomer = selectedCustomer;
             Address addr = null;
             if(selectedCustomer.getDeliveryAddress() != null) {
                 addr = selectedCustomer.getDeliveryAddress();
@@ -190,16 +234,109 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         return null;
     }
 
+    private void addProductsToComboBox() {
+        form.getProductComboBox().removeAllItems();
+        List<Product> prods = getProducts();
+        for (Product product : prods) {
+            form.getProductComboBox().addItem(product);
+        }
+    }
+
+    private void addProductsToTable() {
+        Product selectedProduct = (Product) form.getProductComboBox().getSelectedItem();
+        if (selectedProduct != null) {
+            Object[] rowData = new Object[] {
+                    selectedProduct.getId(),
+                    selectedProduct.getName(),
+                    selectedProduct.getNetPrice(),
+                    selectedProduct.getGrossPrice(),
+                    1,  // default qty
+                    0,  // default discount
+                    selectedProduct.getGrossPrice(),
+            };
+            form.getproductTableModel().addRow(rowData);
+            form.getProductComboBox().removeItem(selectedProduct);
+        }
+    }
+
+    private void updateAvailableProducts() {
+        List<Product> latestProducts = getProducts();
+
+        Set<Integer> productIdsInOrder = new HashSet<>();
+        for (int i = 0; i < form.getproductTableModel().getRowCount(); i++) {
+            Integer productId = (Integer) form.getproductTableModel().getValueAt(i, 0);
+            productIdsInOrder.add(productId);
+        }
+
+        form.getProductComboBox().removeAllItems();
+
+        for (Product product : latestProducts) {
+            if (!productIdsInOrder.contains(product.getId())) {
+                form.getProductComboBox().addItem(product);
+            }
+        }
+    }
+
+    private BigDecimal calculateTotal(BigDecimal price, int quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
+
+    }
+
+    private BigDecimal priceAfterDiscount(BigDecimal price, int discount) {
+        BigDecimal rabatDecimal = BigDecimal.valueOf(discount).divide(BigDecimal.valueOf(100));
+        return price.multiply(BigDecimal.valueOf(discount)).multiply(BigDecimal.ONE.subtract(rabatDecimal));
+    }
+
+    private void calculateTotalSum(TableModelEvent e) {
+        int row = e.getFirstRow();
+        int column = e.getColumn();
+
+        if (column == 4 || column == 5) {
+            BigDecimal cenaBrutto = null;
+            int quantity = 0;
+            int discount = 0;
+
+            try {
+                cenaBrutto = new BigDecimal(form.getproductTableModel().getValueAt(row, 3).toString());
+                quantity = Integer.parseInt(form.getproductTableModel().getValueAt(row, 4).toString());
+
+                Object rabatObj = form.getproductTableModel().getValueAt(row, 5);
+                if (rabatObj != null) {
+                    discount = Integer.parseInt(rabatObj.toString());
+
+                    if (discount < 0 || discount > 100) {
+                        JOptionPane.showMessageDialog(null, "Rabat musi być wartością od 0 do 100.");
+                        return;
+                    }
+                }
+
+                if (quantity <= 0) {
+                    JOptionPane.showMessageDialog(null, "Ilość musi być większa od 0.");
+                    return;
+                }
+
+                BigDecimal rabatDecimal = BigDecimal.valueOf(discount).divide(BigDecimal.valueOf(100));
+                BigDecimal newGrossPrice = cenaBrutto.multiply(BigDecimal.valueOf(quantity)).multiply(BigDecimal.ONE.subtract(rabatDecimal));
+
+                form.getproductTableModel().setValueAt(newGrossPrice.setScale(2, BigDecimal.ROUND_HALF_UP), row, 6);
+            } catch (NumberFormatException exception) {
+                JOptionPane.showMessageDialog(null, "Podane wartości muszą być liczbami.");
+            } catch (NullPointerException exception) {
+                JOptionPane.showMessageDialog(null, "Wszystkie pola muszą być wypełnione.");
+            }
+        }
+    }
+
     private void removeProductFromOrderList() {
-//        Integer selectedElement = getSelectedElementFromProductList();
-//        if (selectedElement != null) {
-//            for (int i = 0; i < form.getproductTableModel().getRowCount(); i++) {
-//                if (form.getproductTableModel().getValueAt(i, 0).equals(selectedElement)) {
-//                    form.getproductTableModel().removeRow(i);
-////                    form.getProductComboBox().
-//                    break;
-//                }
-//            }
-//        }
+        Integer selectedElement = getSelectedElementFromProductList();
+        if (selectedElement != null) {
+            for (int i = 0; i < form.getproductTableModel().getRowCount(); i++) {
+                if (form.getproductTableModel().getValueAt(i, 0).equals(selectedElement)) {
+                    form.getproductTableModel().removeRow(i);
+                    updateAvailableProducts();
+                    break;
+                }
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Address implements Serializable {
     private String street;
@@ -57,5 +58,23 @@ public class Address implements Serializable {
                 "Kod pocztowy: " + postalCode + '\n' +
                 "Województwo: " + state + '\n' +
                 "Kraj: " + country + '\n';
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(street, address.street) &&
+                Objects.equals(houseNumber, address.houseNumber) &&
+                Objects.equals(apartmentNumber, address.apartmentNumber) &&
+                Objects.equals(city, address.city) &&
+                Objects.equals(postalCode, address.postalCode) &&
+                Objects.equals(state, address.state) &&
+                Objects.equals(country, address.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(street, houseNumber, apartmentNumber, city, postalCode, state, country);
     }
 }

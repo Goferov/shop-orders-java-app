@@ -2,19 +2,14 @@ package view.order;
 
 import model.Customer;
 import model.Product;
-import util.FileUtil;
 import view.AbstractFormView;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.util.List;
 import java.awt.*;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
 
 public class OrderFormView extends AbstractFormView {
 
@@ -41,8 +36,6 @@ public class OrderFormView extends AbstractFormView {
         pack();
         setLocationRelativeTo(parent);
     }
-
-
 
     public JComboBox<Customer> getCustomerComboBox() {
         return customerComboBox;
@@ -118,13 +111,16 @@ public class OrderFormView extends AbstractFormView {
         formPanel.add(new JLabel("Adres dostawy - Country:"));
         formPanel.add(deliveryCountryField);
         getContentPane().add(formPanel, BorderLayout.CENTER);
+        addProductTableToView();
 
-        // Product List
+    }
+
+    private void addProductTableToView() {
         JPanel productPanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID Produktu", "Nazwa", "Cena", "Ilość", "Rabat", "Suma Netto", "Suma Brutto"};
+        String[] columnNames = {"ID", "Nazwa", "Netto", "Brutto", "Ilość", "Rabat", "Suma"};
         productTableModel = new DefaultTableModel(null, columnNames) {
             public boolean isCellEditable(int row, int column) {
-                return column == 3 || column == 4;
+                return column == 4 || column == 5;
             }
         };
         productTable = new JTable(productTableModel);
@@ -138,78 +134,6 @@ public class OrderFormView extends AbstractFormView {
         getContentPane().add(productPanel, BorderLayout.EAST);
 
         addActionToAddButton(e -> createDialogWithProductComboBox());
-
-
-// Załaduj produkty do comboBoxa. Zakładamy, że masz metodę getProducts().
-        List<Product> prods = FileUtil.loadFromFile("products.dat");
-        for (Product product : prods) {
-            productComboBox.addItem(product);
-        }
-
-
-
-        selectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Product selectedProduct = (Product) productComboBox.getSelectedItem();
-                if (selectedProduct != null) {
-                    Object[] rowData = new Object[]{
-                            selectedProduct.getId(),
-                            selectedProduct.getName(),
-                            selectedProduct.getGrossPrice(),
-                            1,  // Domyślna ilość
-                            0.0,  // Domyślny rabat
-                            selectedProduct.getNetPrice(),  // Suma Netto
-                            selectedProduct.getGrossPrice() // Suma Brutto //selectedProduct.getPrice() * (1 + selectedProduct.getTax()/100)
-                    };
-                    productTableModel.addRow(rowData);
-                    productComboBox.removeItem(selectedProduct);
-
-                } else {
-                    // Opcjonalnie: Pokaż wiadomość, jeśli żaden produkt nie został wybrany
-                }
-            }
-        });
-
-        productTableModel.addTableModelListener(new TableModelListener() {
-            public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
-
-                // Sprawdź, czy zmieniona kolumna to 'Ilość' (indeks 3) lub 'Rabat' (indeks 4)
-                if (column == 3 || column == 4) {
-                    BigDecimal cenaBrutto = null;
-                    BigDecimal ilosc = null;
-                    BigDecimal rabat = null;
-
-                    try {
-                        cenaBrutto = new BigDecimal(productTableModel.getValueAt(row, 5).toString());
-                        ilosc = new BigDecimal(productTableModel.getValueAt(row, 3).toString());
-                        rabat = new BigDecimal(productTableModel.getValueAt(row, 4).toString());
-
-                        // Walidacja wartości
-                        if (ilosc.compareTo(BigDecimal.ZERO) <= 0) {
-                            JOptionPane.showMessageDialog(null, "Ilość musi być większa od 0.");
-                            return; // Przerwij dalsze wykonywanie, jeśli ilość nie jest prawidłowa
-                        }
-
-                        // Oblicz nową wartość sumy brutto
-                        BigDecimal nowaSumaBrutto = cenaBrutto.multiply(ilosc).multiply(BigDecimal.ONE.subtract(rabat));
-
-                        // Aktualizuj model tabeli
-                        productTableModel.setValueAt(nowaSumaBrutto, row, 2);
-                    } catch (NumberFormatException exception) {
-                        // Wyświetl wiadomość, jeśli podana wartość nie jest liczbą
-                        JOptionPane.showMessageDialog(null, "Podane wartości muszą być liczbami.");
-                    } catch (NullPointerException exception) {
-                        // Wyświetl wiadomość, jeśli którakolwiek z wartości jest null
-                        JOptionPane.showMessageDialog(null, "Wszystkie pola muszą być wypełnione.");
-                    }
-                }
-            }
-        });
-
-
     }
 
     @Override
@@ -235,15 +159,27 @@ public class OrderFormView extends AbstractFormView {
     }
 
     public void addActionToCustomerList(ActionListener actionListener) {
+        customerComboBox.addActionListener(actionListener);
+    }
+
+    public void addActionToAddButton(ActionListener actionListener) {
         addButton.addActionListener(actionListener);
     }
 
-    private void addActionToAddButton(ActionListener actionListener) {
-        addButton.addActionListener(actionListener);
+    public void addActionToSelectButton(ActionListener actionListener) {
+        selectButton.addActionListener(actionListener);
     }
 
     public void addActionToRemoveButton(ActionListener actionListener) {
         removeButton.addActionListener(actionListener);
+    }
+
+    public void addActionToProductTableModel(TableModelListener actionListener) {
+        productTableModel.addTableModelListener(actionListener);
+    }
+
+    public void addActionToCustomerComboBox(PopupMenuListener actionListener) {
+        customerComboBox.addPopupMenuListener(actionListener);
     }
 
 }

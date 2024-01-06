@@ -1,16 +1,17 @@
 package model;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 public class Order extends AbstractModel {
     private Date date;
-    private List<ItemsList> ItemsList;
+    private List<ItemsList> itemsList;
     private Customer client;
     private Address deliveryAddress;
 
     public Order(Integer id, Date date, List<model.ItemsList> itemsList, Customer client, Address deliveryAddress) {
         super(id);
         this.date = date;
-        ItemsList = itemsList;
+        this.itemsList = itemsList;
         this.client = client;
         this.deliveryAddress = deliveryAddress;
     }
@@ -20,7 +21,7 @@ public class Order extends AbstractModel {
     }
 
     public List<model.ItemsList> getItemsList() {
-        return ItemsList;
+        return itemsList;
     }
 
     public Customer getClient() {
@@ -31,7 +32,20 @@ public class Order extends AbstractModel {
         return deliveryAddress;
     }
 
-    public int getOrderPrice() {
-        return 0;
+    public BigDecimal getOrderTotalPrice() {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (ItemsList item : itemsList) {
+            BigDecimal itemTotal = item.getGrossTotal();
+
+            if (item.getDiscount() > 0) {
+                BigDecimal discount = BigDecimal.valueOf(item.getDiscount()).divide(new BigDecimal(100));
+                itemTotal = itemTotal.subtract(itemTotal.multiply(discount));
+            }
+
+            total = total.add(itemTotal);
+        }
+
+        return total;
     }
 }
