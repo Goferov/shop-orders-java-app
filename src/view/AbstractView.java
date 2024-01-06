@@ -12,7 +12,7 @@ public abstract class AbstractView extends JPanel {
     protected JButton addButton = new JButton("Dodaj");;
     protected JButton removeButton = new JButton("Usuń");;
     protected JButton filterButton = new JButton("Filtruj");;
-    public JTable table;
+    protected JTable table;
     public DefaultTableModel tableModel;
     TableRowSorter<TableModel> sorter;
 
@@ -45,9 +45,6 @@ public abstract class AbstractView extends JPanel {
         removeButton.addActionListener(action);
     }
 
-    public void filterButtonAction(ActionListener action) {
-        filterButton.addActionListener(action);
-    }
     public void doubleClickAction(MouseAdapter action) {
         table.addMouseListener(action);
     }
@@ -73,5 +70,9 @@ public abstract class AbstractView extends JPanel {
 
     public TableRowSorter<TableModel> getSorter() {
         return sorter;
+    }
+
+    public JTable getTable() {
+        return table;
     }
 }

@@ -28,7 +28,6 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
         loadFromFile();
         view.addButtonAction(e -> showForm());
         view.removeButtonAction(e -> remove());
-        view.filterButtonAction(e -> {});
         form.submitForm(e -> add());
         form.cancelForm(e -> cancelForm());
 
@@ -56,7 +55,7 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
         return currentId + 1;
     }
 
-    private T findById(Integer id) {
+    protected T findById(Integer id) {
         Optional<T> findedElem = dataList.stream().filter(c -> c.getId().equals(id)).findFirst();
         return findedElem.orElse(null);
     }

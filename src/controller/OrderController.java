@@ -12,7 +12,9 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,7 +36,7 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         form.addActionToAddButton(e -> updateAvailableProducts());
         form.addActionToCustomerComboBox(new PopupMenuListener() {
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                addCustomersToComboBox();
+                addCustomersToFormComboBox(form.getCustomerComboBox());
             }
 
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
@@ -43,6 +45,20 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
             public void popupMenuCanceled(PopupMenuEvent e) {}
         });
+
+        view.addActionToCustomerComboBox(new PopupMenuListener() {
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                addCustomersToComboBox(view.getCustomerComboBox());
+            }
+
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            public void popupMenuCanceled(PopupMenuEvent e) {}
+        });
+
+        view.addActionToFilterButton(e -> search());
+        view.addActionToResetButton(e -> resetFilter());
     }
 
     @Override
@@ -181,22 +197,26 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         return FileUtil.loadFromFile("products.dat");
     }
 
-    private void addCustomersToComboBox() {
-        form.getCustomerComboBox().removeAllItems();
-        List<Customer> dataList = getCustomers();
-        for(Customer customer : dataList) {
-            form.getCustomerComboBox().addItem(customer);
-        }
-        form.getCustomerComboBox().setSelectedIndex(-1);
+    private void addCustomersToFormComboBox(JComboBox<Customer> comboBox) {
+        addCustomersToComboBox(comboBox);
 
         if (latestCustomer != null) {
-            for (int i = 0; i < form.getCustomerComboBox().getItemCount(); i++) {
-                if (form.getCustomerComboBox().getItemAt(i).equals(latestCustomer)) {
-                    form.getCustomerComboBox().setSelectedIndex(i);
+            for (int i = 0; i < comboBox.getItemCount(); i++) {
+                if (comboBox.getItemAt(i).equals(latestCustomer)) {
+                    comboBox.setSelectedIndex(i);
                     break;
                 }
             }
         }
+    }
+
+    private void addCustomersToComboBox(JComboBox<Customer> comboBox) {
+        comboBox.removeAllItems();
+        List<Customer> dataList = getCustomers();
+        for(Customer customer : dataList) {
+            comboBox.addItem(customer);
+        }
+        comboBox.setSelectedIndex(-1);
     }
 
     private void updateDeliveryAddressFields() {
@@ -338,5 +358,59 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
                 }
             }
         }
+    }
+
+    private PopupMenuListener customerComboBoxAction() {
+        return new PopupMenuListener() {
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                addCustomersToFormComboBox(form.getCustomerComboBox());
+            }
+
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                updateDeliveryAddressFields();
+            }
+
+            public void popupMenuCanceled(PopupMenuEvent e) {}
+        };
+    }
+
+    private void search() {
+        Date startDate = (Date) view.getStartDateSpinner().getValue();
+        Date endDate = (Date) view.getEndDateSpinner().getValue();
+
+        Customer selectedCustomer = (Customer) view.getCustomerComboBox().getSelectedItem();
+
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) view.getTable().getRowSorter();
+        sorter.setRowFilter(new RowFilter<>() {
+            @Override
+            public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                boolean dateInRange = true;  // Domyślnie prawdziwe, jeśli filtr daty nie jest ustawiony
+                if (startDate != null && endDate != null) {
+                    try {
+                        Date orderDate = view.getDataFormatter().parse(entry.getStringValue(1));
+                        dateInRange = !orderDate.before(startDate) && !orderDate.after(endDate);
+                    } catch (ParseException ex) {
+                        return false;  // Jeśli nie można sparsować daty, wiersz nie zostanie uwzględniony
+                    }
+                }
+
+                String orderId = entry.getStringValue(0);
+                Order findedOrder = findById(Integer.parseInt(orderId));
+                boolean customerMatches = (selectedCustomer == null || findedOrder.getClient().equals(selectedCustomer));
+
+                return dateInRange && customerMatches;
+            }
+        });
+    }
+
+    private Order getOrderById() {
+        return null;
+    }
+
+    private void resetFilter() {
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) view.getTable().getRowSorter();
+        sorter.setRowFilter(null);  // Usunięcie wszelkich filtrów
+        view.getTable().clearSelection();  // Opcjonalnie, czyści zaznaczenie w tabeli
+        form.getCustomerComboBox().setSelectedIndex(-1);
     }
 }
