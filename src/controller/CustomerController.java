@@ -2,11 +2,25 @@ package controller;
 
 import model.Address;
 import model.Customer;
+import model.Order;
+import util.DateTimeUtil;
+import util.FileUtil;
 import util.ValidatorUtil;
 import view.customer.CustomerFormView;
 import view.customer.CustomerView;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CustomerController extends AbstractController<Customer, CustomerView, CustomerFormView> {
     private static final String CUSTOMER_FILE = "customers.dat";
@@ -15,6 +29,8 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         super(view, form, CUSTOMER_FILE);
         form.showDeliveryPanelYes(e -> toggleDeliveryAddressFields(true));
         form.showDeliveryPanelNo(e -> toggleDeliveryAddressFields(false));
+        view.addActionToFilterButton(e -> search());
+        view.addActionToResetButton(e -> resetFilter());
     }
 
 
@@ -23,6 +39,9 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         form.pack();
     }
 
+    private List<Order> getOrders() {
+        return FileUtil.loadFromFile("orders.dat");
+    }
 
     @Override
     protected void showDetails(Customer element) {
@@ -147,6 +166,100 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
                 errorMsg.append("Adres dostawy - kraj jest wymagany.\n");
             }
         }
+    }
+
+    private void search() {
+        String startDateString = view.getStartDateField().getText();
+        String endDateString = view.getEndDateField().getText();
+        Date startDate = DateTimeUtil.parseDate(startDateString);
+        Date endDate = DateTimeUtil.parseDate(endDateString);
+
+        BigDecimal minOrderValue = null;
+
+        try {
+            if (!view.getMinOrderValueField().getText().isEmpty()) {
+                minOrderValue = new BigDecimal(view.getMinOrderValueField().getText());
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Wprowadzono nieprawidłową wartość. Proszę wprowadzić liczbę.");
+            return;
+        }
+        boolean startFilter = (startDate != null || endDate != null || minOrderValue != null);
+        if (!startFilter) {
+            return ;
+        }
+        Map<Customer, BigDecimal> customerOrderTotalMap = getOrders().stream()
+                .filter(order -> (startDate == null || !order.getDate().before(startDate)) &&
+                        (endDate == null || !order.getDate().after(endDate)))
+                .collect(Collectors.groupingBy(
+                        Order::getClient,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                Order::getOrderTotalPrice,
+                                BigDecimal::add
+                        )
+                ));
+
+        BigDecimal finalMinOrderValue = minOrderValue;
+        Set<Customer> customersMeetingCriteria = customerOrderTotalMap.entrySet().stream()
+                .filter(entry -> (finalMinOrderValue == null || entry.getValue().compareTo(finalMinOrderValue) >= 0))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) view.getTable().getModel());
+        view.getTable().setRowSorter(sorter);
+
+        sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+
+                String clientId = entry.getStringValue(0);
+                Customer clientInRow = findById(Integer.parseInt(clientId));
+                updateTableWithOrderSum(customerOrderTotalMap);
+                return customersMeetingCriteria.contains(clientInRow);
+            }
+        });
+    }
+
+    private void updateTableWithOrderSum(Map<Customer, BigDecimal> customerMap) {
+        DefaultTableModel model = (DefaultTableModel) view.getTable().getModel();
+
+        if (model.findColumn("Suma Zamówień") == -1) {
+            model.addColumn("Suma Zamówień");
+        }
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Integer clientId = Integer.parseInt(model.getValueAt(i, 0).toString());
+
+            Customer customer = findById(clientId);
+            BigDecimal orderSum = customerMap.getOrDefault(customer, BigDecimal.ZERO);
+
+            model.setValueAt(orderSum, i, model.getColumnCount() - 1);
+        }
+    }
+
+    private void removeOrderSumColumn() {
+        DefaultTableModel model = (DefaultTableModel) view.getTable().getModel();
+
+        int orderSumColumnIndex = model.findColumn("Suma Zamówień");
+
+        if (orderSumColumnIndex != -1) {
+            TableColumnModel columnModel = view.getTable().getColumnModel();
+            TableColumn orderSumColumn = columnModel.getColumn(orderSumColumnIndex);
+            view.getTable().removeColumn(orderSumColumn);
+            model.setColumnCount(model.getColumnCount() - 1);
+        }
+    }
+
+    private void resetFilter() {
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) view.getTable().getRowSorter();
+        sorter.setRowFilter(null);
+        view.getTable().clearSelection();
+        view.getStartDateField().setText("");
+        view.getEndDateField().setText("");
+        view.getMinOrderValueField().setText("");
+        removeOrderSumColumn();
+//        view.getMaxOrderValueField().setText("");
     }
 
 }

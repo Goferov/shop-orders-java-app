@@ -11,7 +11,8 @@ import java.awt.event.MouseAdapter;
 public abstract class AbstractView extends JPanel {
     protected JButton addButton = new JButton("Dodaj");;
     protected JButton removeButton = new JButton("Usuń");;
-    protected JButton filterButton = new JButton("Filtruj");;
+    protected JButton filterButton = new JButton("Filtruj");
+    protected JButton resetButton = new JButton("Reset");
     protected JTable table;
     public DefaultTableModel tableModel;
     TableRowSorter<TableModel> sorter;
@@ -27,7 +28,6 @@ public abstract class AbstractView extends JPanel {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
-        buttonPanel.add(filterButton);
 
         setLayout(new BorderLayout());
         add(listScrollPane, BorderLayout.CENTER);
@@ -47,6 +47,14 @@ public abstract class AbstractView extends JPanel {
 
     public void doubleClickAction(MouseAdapter action) {
         table.addMouseListener(action);
+    }
+
+    public void addActionToFilterButton(ActionListener action) {
+        filterButton.addActionListener(action);
+    }
+
+    public void addActionToResetButton(ActionListener action) {
+        resetButton.addActionListener(action);
     }
 
     public abstract void addToView(Object o);
