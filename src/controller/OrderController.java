@@ -116,11 +116,12 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     @Override
     protected void validateFormFields() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             sdf.setLenient(false);
             orderDate = sdf.parse(form.getOrderDateField());
+            System.out.println(orderDate);
         } catch (Exception e) {
-            errorMsg.append("Data powinna być zapisana w formacie yyyy-mm-dd.\n");
+            errorMsg.append("Data powinna być zapisana w formacie dd-MM-yyyy.\n");
         }
 
         if(selectedCustomer == null) {
@@ -375,42 +376,71 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     }
 
     private void search() {
-        Date startDate = (Date) view.getStartDateSpinner().getValue();
-        Date endDate = (Date) view.getEndDateSpinner().getValue();
+        String startDateString = view.getStartDateField().getText();
+        String endDateString = view.getEndDateField().getText();
+
+        Date startDate = DateTimeUtil.parseDate(startDateString);
+        Date endDate = DateTimeUtil.parseDate(endDateString);
 
         Customer selectedCustomer = (Customer) view.getCustomerComboBox().getSelectedItem();
+        BigDecimal minOrderValue = null;
+        BigDecimal maxOrderValue = null;
+
+        try {
+            if (!view.getMinOrderValueField().getText().isEmpty()) {
+                minOrderValue = new BigDecimal(view.getMinOrderValueField().getText());
+            }
+            if (!view.getMaxOrderValueField().getText().isEmpty()) {
+                maxOrderValue = new BigDecimal(view.getMaxOrderValueField().getText());
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Wprowadzono nieprawidłową wartość. Proszę wprowadzić liczbę.");
+            return;
+        }
 
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) view.getTable().getRowSorter();
+        BigDecimal finalMaxOrderValue = maxOrderValue;
+        BigDecimal finalMinOrderValue = minOrderValue;
         sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
-                boolean dateInRange = true;  // Domyślnie prawdziwe, jeśli filtr daty nie jest ustawiony
+                boolean dateInRange = true;
                 if (startDate != null && endDate != null) {
                     try {
                         Date orderDate = view.getDataFormatter().parse(entry.getStringValue(1));
                         dateInRange = !orderDate.before(startDate) && !orderDate.after(endDate);
                     } catch (ParseException ex) {
-                        return false;  // Jeśli nie można sparsować daty, wiersz nie zostanie uwzględniony
+                        return false;
                     }
                 }
 
                 String orderId = entry.getStringValue(0);
-                Order findedOrder = findById(Integer.parseInt(orderId));
-                boolean customerMatches = (selectedCustomer == null || findedOrder.getClient().equals(selectedCustomer));
+                Order foundOrder = findById(Integer.parseInt(orderId));
+                boolean customerMatches = (selectedCustomer == null || foundOrder.getClient().equals(selectedCustomer));
 
-                return dateInRange && customerMatches;
+                boolean orderValueMatches = true;
+                if (finalMinOrderValue != null || finalMaxOrderValue != null) {
+                    BigDecimal orderValue = new BigDecimal(entry.getStringValue(2));
+                    if (finalMinOrderValue != null && orderValue.compareTo(finalMinOrderValue) < 0) {
+                        orderValueMatches = false;
+                    }
+                    if (finalMaxOrderValue != null && orderValue.compareTo(finalMaxOrderValue) > 0) {
+                        orderValueMatches = false;
+                    }
+                }
+
+                return dateInRange && customerMatches && orderValueMatches;
             }
         });
     }
 
-    private Order getOrderById() {
-        return null;
-    }
-
     private void resetFilter() {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) view.getTable().getRowSorter();
-        sorter.setRowFilter(null);  // Usunięcie wszelkich filtrów
-        view.getTable().clearSelection();  // Opcjonalnie, czyści zaznaczenie w tabeli
-        form.getCustomerComboBox().setSelectedIndex(-1);
+        sorter.setRowFilter(null);
+        view.getTable().clearSelection();
+        view.getStartDateField().setText("");
+        view.getEndDateField().setText("");
+        view.getMinOrderValueField().setText("");
+        view.getMaxOrderValueField().setText("");
     }
 }

@@ -2,6 +2,7 @@ package view.order;
 
 import model.Customer;
 import model.Product;
+import util.DateTimeUtil;
 import view.AbstractFormView;
 
 import javax.swing.*;
@@ -13,7 +14,7 @@ import javax.swing.event.TableModelListener;
 
 public class OrderFormView extends AbstractFormView {
 
-    private JTextField orderDateField = new JTextField();
+    private JFormattedTextField orderDateField = DateTimeUtil.createTextFieldWithDataFormat();
 
     private JComboBox<Customer> customerComboBox = new JComboBox<>();
     private JTable productTable;

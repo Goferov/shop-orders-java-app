@@ -7,8 +7,10 @@ import view.AbstractView;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class OrderView extends AbstractView {
@@ -16,20 +18,22 @@ public class OrderView extends AbstractView {
     private JButton filterButton = new JButton("Filtruj");
     private JButton resetButton = new JButton("Reset");
     private SimpleDateFormat dataFormatter = new SimpleDateFormat("dd-MM-yyyy");
-    private JSpinner startDateSpinner;
-    private JSpinner endDateSpinner;
+    private JFormattedTextField startDateSpinner;
+    private JFormattedTextField endDateSpinner;
     private JComboBox<Customer> customerComboBox = new JComboBox<>();
+    private JTextField minOrderValueField = new JTextField();  // Użytkownik wpisuje minimalną wartość zamówienia tutaj
+    private JTextField maxOrderValueField = new JTextField();
 
 
     public SimpleDateFormat getDataFormatter() {
         return dataFormatter;
     }
 
-    public JSpinner getStartDateSpinner() {
+    public JFormattedTextField  getStartDateField() {
         return startDateSpinner;
     }
 
-    public JSpinner getEndDateSpinner() {
+    public JFormattedTextField  getEndDateField() {
         return endDateSpinner;
     }
 
@@ -37,23 +41,33 @@ public class OrderView extends AbstractView {
         return customerComboBox;
     }
 
+    public JTextField getMinOrderValueField() {
+        return minOrderValueField;
+    }
+
+    public JTextField getMaxOrderValueField() {
+        return maxOrderValueField;
+    }
+
     public OrderView() {
         super(new String[]{"ID", "Data złożenia", "Cena", "Zamawiający"});
-        startDateSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor startDateEditor = new JSpinner.DateEditor(startDateSpinner, "dd-MM-yyyy");
-        startDateSpinner.setEditor(startDateEditor);
+        startDateSpinner = DateTimeUtil.createTextFieldWithDataFormat();
 
-        endDateSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor endDateEditor = new JSpinner.DateEditor(endDateSpinner, "dd-MM-yyyy");
-        endDateSpinner.setEditor(endDateEditor);
+        endDateSpinner = DateTimeUtil.createTextFieldWithDataFormat();
         customerComboBox.setPreferredSize(new Dimension(150, 30));
+        minOrderValueField.setPreferredSize(new Dimension(100, minOrderValueField.getPreferredSize().height));
+        maxOrderValueField.setPreferredSize(new Dimension(100, maxOrderValueField.getPreferredSize().height));
+
         JPanel filterPanel = new JPanel();
         filterPanel.add(customerComboBox);
         filterPanel.add(startDateSpinner);
         filterPanel.add(endDateSpinner);
+        filterPanel.add(minOrderValueField);
+        filterPanel.add(maxOrderValueField);
         filterPanel.add(filterButton);
         filterPanel.add(resetButton);
         add(filterPanel, BorderLayout.NORTH);
+
 
         dataFormatter.setLenient(false);
     }
@@ -62,6 +76,8 @@ public class OrderView extends AbstractView {
         Order order  = (Order) o;
         tableModel.addRow(new Object[]{order.getId(), DateTimeUtil.showDate(order.getDate()), order.getOrderTotalPrice(), order.getClient()});
     }
+
+
 
     public void addActionToFilterButton(ActionListener action) {
         filterButton.addActionListener(action);
