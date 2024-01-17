@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -30,6 +31,7 @@ public abstract class AbstractView extends JPanel {
         buttonPanel.add(removeButton);
 
         setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(10, 10, 10, 10));
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 

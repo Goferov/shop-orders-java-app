@@ -47,11 +47,11 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
     protected void showDetails(Customer element) {
         if(element != null) {
             StringBuilder details = new StringBuilder();
-            details.append("Imię: ").append(element.getName()).append("\n");
-            details.append("Nazwisko: ").append(element.getLastname()).append("\n");
-            details.append("Firma: ").append(element.getCompany()).append("\n");
+            details.append("Imię: ").append(element.getName()).append("\n\n");
+            details.append("Nazwisko: ").append(element.getLastname()).append("\n\n");
+            details.append("Firma: ").append(element.getCompany()).append("\n\n");
             details.append("NIP: ").append(element.getNip()).append("\n\n");
-            details.append("Adres:\n").append(element.getAddress()).append("\n\n");
+            details.append("Adres:\n").append(element.getAddress()).append("\n");
             details.append("Adres dostawy:\n").append(
                     element.getDeliveryAddress() != null ? element.getDeliveryAddress() : "Taki sam jak powyżej"
             ).append("\n\n");

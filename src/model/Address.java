@@ -51,13 +51,13 @@ public class Address implements Serializable {
     }
     @Override
     public String toString() {
-        return "Ulica: " + street + '\n' +
-                "Numer budynku: " + houseNumber + '\n' +
-                "Numer mieszkania: " + (apartmentNumber.isEmpty() ? "N/A" : apartmentNumber) + '\n' +
-                "Miasto: " + city + '\n' +
-                "Kod pocztowy: " + postalCode + '\n' +
-                "Województwo: " + state + '\n' +
-                "Kraj: " + country + '\n';
+        return "Ulica: " + street + "\n\n" +
+                "Numer budynku: " + houseNumber + "\n\n" +
+                "Numer mieszkania: " + (apartmentNumber.isEmpty() ? "N/A" : apartmentNumber) + "\n\n" +
+                "Miasto: " + city + "\n\n" +
+                "Kod pocztowy: " + postalCode + "\n\n" +
+                "Województwo: " + state + "\n\n" +
+                "Kraj: " + country + "\n\n";
     }
 
     public boolean equals(Object o) {
