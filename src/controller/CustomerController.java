@@ -14,8 +14,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +27,17 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
 
     public CustomerController(CustomerView view, CustomerFormView form) {
         super(view, form, CUSTOMER_FILE);
-        form.showDeliveryPanelYes(e -> toggleDeliveryAddressFields(true));
-        form.showDeliveryPanelNo(e -> toggleDeliveryAddressFields(false));
+        form.showDeliveryPanelYes(e -> setDeliveryAddressFields(true));
+        form.showDeliveryPanelNo(e -> setDeliveryAddressFields(false));
         view.addActionToFilterButton(e -> search());
         view.addActionToResetButton(e -> resetFilter());
     }
 
-
-    private void toggleDeliveryAddressFields(boolean show) {
-        form.getDeliveryAddressPanel().setVisible(show);
-        form.pack();
+    private void setDeliveryAddressFields(boolean enable) {
+        form.setDeliveryAddressFieldsEnabled(enable);
+        if(!enable) {
+            resetDeliveryAddressFieldsColor();
+        }
     }
 
     private List<Order> getOrders() {
@@ -63,110 +64,100 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
     @Override
     protected Customer create() {
         Address customerAddress = new Address(
-                form.getStreetField(),
-                form.getHouseNumberField(),
-                form.getApartmentNumberField(),
-                form.getCityField(),
-                form.getPostalCodeField(),
-                form.getStateField(),
-                form.getCountryField()
+                form.getStreetField().getText(),
+                form.getHouseNumberField().getText(),
+                form.getApartmentNumberField().getText(),
+                form.getCityField().getText(),
+                form.getPostalCodeField().getText(),
+                form.getStateField().getText(),
+                form.getCountryField().getText()
         );
         Address deliveryAddress = null;
         if (form.getdeliveryAddressYes().isSelected()) {
             deliveryAddress = new Address(
-                    form.getDeliveryStreetField(),
-                    form.getDeliveryHouseNumberField(),
-                    form.getDeliveryApartmentNumberField(),
-                    form.getDeliveryCityField(),
-                    form.getDeliveryPostalCodeField(),
-                    form.getDeliveryStateField(),
-                    form.getDeliveryCountryField()
+                    form.getDeliveryStreetField().getText(),
+                    form.getDeliveryHouseNumberField().getText(),
+                    form.getDeliveryApartmentNumberField().getText(),
+                    form.getDeliveryCityField().getText(),
+                    form.getDeliveryPostalCodeField().getText(),
+                    form.getDeliveryStateField().getText(),
+                    form.getDeliveryCountryField().getText()
             );
         }
 
         return new Customer(
                 generateNextId(),
-                form.getNameField(),
-                form.getLastNameField(),
-                form.getCompanyField(),
-                form.getNipField(),
+                form.getNameField().getText(),
+                form.getLastNameField().getText(),
+                form.getCompanyField().getText(),
+                form.getNipField().getText(),
                 customerAddress,
                 deliveryAddress
         );
     }
 
+    @Override
     protected void validateFormFields() {
+        validateAndColorField(form.getNameField(), "Imię jest wymagane.\n");
+        validateAndColorField(form.getLastNameField(), "Nazwisko jest wymagane.\n");
 
-        if(!ValidatorUtil.validateTextField(form.getNameField())) {
-            errorMsg.append("Imię jest wymagane.\n");
-        }
-
-        if(!ValidatorUtil.validateTextField(form.getLastNameField())) {
-            errorMsg.append("Nazwisko jest wymagane.\n");
-        }
-
-        if (!ValidatorUtil.validateTextField(form.getCompanyField()) && !form.getNipField().isEmpty()) {
+        if (!ValidatorUtil.validateTextField(form.getCompanyField().getText()) && !form.getNipField().getText().isEmpty()) {
             errorMsg.append("Nazwa firmy jest wymagana, gdy podany jest NIP.\n");
+            form.getCompanyField().setBackground(Color.PINK);
+        } else {
+            form.getCompanyField().setBackground(Color.WHITE);
         }
 
-        if (!ValidatorUtil.validateNIP(form.getNipField()) && !form.getCompanyField().isEmpty()) {
-            errorMsg.append("NIP jest wymagany, gdy podana jest nazwa firmy.\n");
-        }
-
-        if(!ValidatorUtil.validateNIP(form.getNipField())) {
+        if(!ValidatorUtil.validateNIP(form.getNipField().getText())) {
             errorMsg.append("NIP jest niepoprawny.\n");
+        }else {
+            form.getNipField().setBackground(Color.WHITE);
         }
 
-        if(!ValidatorUtil.validateTextField(form.getStreetField())) {
-            errorMsg.append("Nazwa ulicy jest wymagana.\n");
+        if (!ValidatorUtil.validateTextField(form.getNipField().getText()) && !form.getCompanyField().getText().isEmpty()) {
+            errorMsg.append("NIP jest wymagany, gdy podana jest nazwa firmy.\n");
+            form.getNipField().setBackground(Color.PINK);
+        } else {
+            form.getNipField().setBackground(Color.WHITE);
         }
 
-        if(!ValidatorUtil.validateTextField(form.getHouseNumberField())) {
-            errorMsg.append("Numer budynku jest wymagany.\n");
-        }
 
-        if(!ValidatorUtil.validateTextField(form.getCityField())) {
-            errorMsg.append("Miejscowość jest wymagana.\n");
-        }
 
-        if(!ValidatorUtil.validatePostalCode(form.getPostalCodeField())) {
+        validateAndColorField(form.getStreetField(), "Nazwa ulicy jest wymagana.\n");
+        validateAndColorField(form.getHouseNumberField(), "Numer budynku jest wymagany.\n");
+        validateAndColorField(form.getCityField(), "Miejscowość jest wymagana.\n");
+        validateAndColorField(form.getPostalCodeField(), "Kod pocztowy jest niepoprawny.\n");
+
+        if(!ValidatorUtil.validatePostalCode(form.getPostalCodeField().getText())) {
             errorMsg.append("Kod pocztowy jest niepoprawny.\n");
+            form.getPostalCodeField().setBackground(Color.PINK);
+        }
+        else {
+            form.getPostalCodeField().setBackground(Color.WHITE);
         }
 
-        if(!ValidatorUtil.validateTextField(form.getStateField())) {
-            errorMsg.append("Województwo jest niepoprawne.\n");
-        }
+        validateAndColorField(form.getStateField(), "Województwo jest wymagane.\n");
+        validateAndColorField(form.getCountryField(), "Kraj jest wymagany.\n");
 
-        if(!ValidatorUtil.validateTextField(form.getCountryField())) {
-            errorMsg.append("Kraj jest wymagany.\n");
-        }
 
         if (form.getdeliveryAddressYes().isSelected()) {
-            if (!ValidatorUtil.validateTextField(form.getDeliveryStreetField())) {
-                errorMsg.append("Adres dostawy - nazwa ulicy jest wymagana.\n");
+            validateAndColorField(form.getDeliveryStreetField(), "Adres dostawy - Nazwa ulicy jest wymagana.\n");
+            validateAndColorField(form.getDeliveryHouseNumberField(), "Adres dostawy - Numer budynku jest wymagany.\n");
+            validateAndColorField(form.getDeliveryCityField(), "Adres dostawy - Miejscowość jest wymagana.\n");
+
+            if(!ValidatorUtil.validatePostalCode(form.getDeliveryPostalCodeField().getText())) {
+                errorMsg.append("Adres dostawy - Kod pocztowy jest niepoprawny.\n");
+                form.getDeliveryPostalCodeField().setBackground(Color.PINK);
+            }
+            else {
+                form.getDeliveryPostalCodeField().setBackground(Color.WHITE);
             }
 
-            if (!ValidatorUtil.validateTextField(form.getDeliveryHouseNumberField())) {
-                errorMsg.append("Adres dostawy - numer budynku jest wymagany.\n");
-            }
-
-            if (!ValidatorUtil.validateTextField(form.getDeliveryCityField())) {
-                errorMsg.append("Adres dostawy - miejscowość jest wymagana.\n");
-            }
-
-            if (!ValidatorUtil.validatePostalCode(form.getDeliveryPostalCodeField())) {
-                errorMsg.append("Adres dostawy - kod pocztowy jest niepoprawny.\n");
-            }
-
-            if (!ValidatorUtil.validateTextField(form.getDeliveryStateField())) {
-                errorMsg.append("Adres dostawy - województwo jest wymagane.\n");
-            }
-
-            if (!ValidatorUtil.validateTextField(form.getDeliveryCountryField())) {
-                errorMsg.append("Adres dostawy - kraj jest wymagany.\n");
-            }
+            validateAndColorField(form.getDeliveryStateField(), "Adres dostawy - Województwo jest wymagane.\n");
+            validateAndColorField(form.getDeliveryCountryField(), "Adres dostawy - Kraj jest wymagany.\n");
         }
     }
+
 
     private void search() {
         String startDateString = view.getStartDateField().getText();
@@ -259,7 +250,16 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         view.getEndDateField().setText("");
         view.getMinOrderValueField().setText("");
         removeOrderSumColumn();
-//        view.getMaxOrderValueField().setText("");
+    }
+
+    private void resetDeliveryAddressFieldsColor() {
+        form.getDeliveryStreetField().setBackground(Color.WHITE);
+        form.getDeliveryHouseNumberField().setBackground(Color.WHITE);
+        form.getDeliveryApartmentNumberField().setBackground(Color.WHITE);
+        form.getDeliveryCityField().setBackground(Color.WHITE);
+        form.getDeliveryPostalCodeField().setBackground(Color.WHITE);
+        form.getDeliveryStateField().setBackground(Color.WHITE);
+        form.getDeliveryCountryField().setBackground(Color.WHITE);
     }
 
 }

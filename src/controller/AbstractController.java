@@ -2,10 +2,12 @@ package controller;
 
 import model.AbstractModel;
 import util.FileUtil;
+import util.ValidatorUtil;
 import view.AbstractFormView;
 import view.AbstractView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
@@ -101,6 +103,16 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
             dataList.removeIf(c -> c.getId().equals(selectedCustomer));
             view.removeFromView(selectedCustomer);
             saveToFile();
+        }
+    }
+
+
+    protected void validateAndColorField(JTextField field, String errorMessage) {
+        if (!ValidatorUtil.validateTextField(field.getText())) {
+            errorMsg.append(errorMessage);
+            field.setBackground(Color.PINK);
+        } else {
+            field.setBackground(Color.WHITE);
         }
     }
 

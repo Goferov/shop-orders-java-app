@@ -32,7 +32,7 @@ public class CustomerFormView extends AbstractFormView {
     private JTextField deliveryStateField = new JTextField();
     private JTextField deliveryCountryField = new JTextField();
 
-    private JPanel deliveryAddressPanel = new JPanel(new GridLayout(0, 2));
+    private JPanel deliveryAddressPanel = new JPanel(new GridBagLayout());
 
     public CustomerFormView(Frame parent) {
         super(parent, "Wprowadź dane klienta");
@@ -42,76 +42,76 @@ public class CustomerFormView extends AbstractFormView {
         setMinimumSize(getSize());
     }
 
-    public String getNameField() {
-        return firstNameField.getText();
+    public JTextField getNameField() {
+        return firstNameField;
     }
 
-    public String getLastNameField() {
-        return lastNameField.getText();
+    public JTextField getLastNameField() {
+        return lastNameField;
     }
 
-    public String getCompanyField() {
-        return companyNameField.getText();
+    public JTextField getCompanyField() {
+        return companyNameField;
     }
 
-    public String getNipField() {
-        return nipField.getText();
+    public JTextField getNipField() {
+        return nipField;
     }
 
-    public String getStreetField() {
-        return streetField.getText();
+    public JTextField getStreetField() {
+        return streetField;
     }
 
-    public String getHouseNumberField() {
-        return buildingNumberField.getText();
+    public JTextField getHouseNumberField() {
+        return buildingNumberField;
     }
 
-    public String getApartmentNumberField() {
-        return apartmentNumberField.getText();
+    public JTextField getApartmentNumberField() {
+        return apartmentNumberField;
     }
 
-    public String getCityField() {
-        return cityField.getText();
+    public JTextField getCityField() {
+        return cityField;
     }
 
-    public String getPostalCodeField() {
-        return postalCodeField.getText();
+    public JTextField getPostalCodeField() {
+        return postalCodeField;
     }
 
-    public String getStateField() {
-        return stateField.getText();
+    public JTextField getStateField() {
+        return stateField;
     }
 
-    public String getCountryField() {
-        return countryField.getText();
+    public JTextField getCountryField() {
+        return countryField;
     }
 
-    public String getDeliveryStreetField() {
-        return deliveryStreetField.getText();
+    public JTextField getDeliveryStreetField() {
+        return deliveryStreetField;
     }
 
-    public String getDeliveryHouseNumberField() {
-        return deliveryHouseNumberField.getText();
+    public JTextField getDeliveryHouseNumberField() {
+        return deliveryHouseNumberField;
     }
 
-    public String getDeliveryApartmentNumberField() {
-        return deliveryApartmentNumberField.getText();
+    public JTextField getDeliveryApartmentNumberField() {
+        return deliveryApartmentNumberField;
     }
 
-    public String getDeliveryCityField() {
-        return deliveryCityField.getText();
+    public JTextField getDeliveryCityField() {
+        return deliveryCityField;
     }
 
-    public String getDeliveryPostalCodeField() {
-        return deliveryPostalCodeField.getText();
+    public JTextField getDeliveryPostalCodeField() {
+        return deliveryPostalCodeField;
     }
 
-    public String getDeliveryStateField() {
-        return deliveryStateField.getText();
+    public JTextField getDeliveryStateField() {
+        return deliveryStateField;
     }
 
-    public String getDeliveryCountryField() {
-        return deliveryCountryField.getText();
+    public JTextField getDeliveryCountryField() {
+        return deliveryCountryField;
     }
 
     public JRadioButton getdeliveryAddressYes() {
@@ -124,218 +124,59 @@ public class CustomerFormView extends AbstractFormView {
 
     public void addFieldsToForm() {
         JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.weightx = 1.0;
 
-        GridBagConstraints gbcLabel = new GridBagConstraints();
-        gbcLabel.gridx = 0;
-        gbcLabel.fill = GridBagConstraints.HORIZONTAL;
-        gbcLabel.anchor = GridBagConstraints.WEST;
-        gbcLabel.insets = new Insets(2, 2, 2, 2);
+        addField(formPanel, "Imię:", firstNameField, gbc);
+        addField(formPanel, "Nazwisko:", lastNameField, gbc);
+        addField(formPanel, "Nazwa firmy (opcjonalne):", companyNameField, gbc);
+        addField(formPanel, "NIP (opcjonalne):", nipField, gbc);
+        addField(formPanel, "Ulica:", streetField, gbc);
+        addField(formPanel, "Numer budynku:", buildingNumberField, gbc);
+        addField(formPanel, "Numer mieszkania (opcjonalne):", apartmentNumberField, gbc);
+        addField(formPanel, "Miasto:", cityField, gbc);
+        addField(formPanel, "Kod pocztowy:", postalCodeField, gbc);
+        addField(formPanel, "Województwo:", stateField, gbc);
+        addField(formPanel, "Kraj:", countryField, gbc);
 
-        GridBagConstraints gbcField = new GridBagConstraints();
-        gbcField.gridx = 1;
-        gbcField.fill = GridBagConstraints.HORIZONTAL;
-        gbcField.insets = new Insets(2, 2, 2, 2);
-        gbcField.weightx = 1.0;
+        addDeliveryAddressRadioBtns(formPanel, gbc);
 
-        int row = 0;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("First Name:"), gbcLabel);
-        gbcField.gridy = row;
-        firstNameField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(firstNameField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Last Name:"), gbcLabel);
-        gbcField.gridy = row;
-        lastNameField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(lastNameField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Company Name (Optional):"), gbcLabel);
-        gbcField.gridy = row;
-        companyNameField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(companyNameField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("NIP (Optional):"), gbcLabel);
-        gbcField.gridy = row;
-        nipField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(nipField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Address - Street:"), gbcLabel);
-        gbcField.gridy = row;
-        streetField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(streetField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Building Number:"), gbcLabel);
-        gbcField.gridy = row;
-        buildingNumberField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(buildingNumberField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Apartment Number (Optional):"), gbcLabel);
-        gbcField.gridy = row;
-        apartmentNumberField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(apartmentNumberField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("City:"), gbcLabel);
-        gbcField.gridy = row;
-        cityField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(cityField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Postal Code:"), gbcLabel);
-        gbcField.gridy = row;
-        postalCodeField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(postalCodeField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("State:"), gbcLabel);
-        gbcField.gridy = row;
-        stateField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(stateField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Country:"), gbcLabel);
-        gbcField.gridy = row;
-        countryField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(countryField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Inny adres dostawy:"), gbcLabel);
-        deliveryAddressGroup.add(deliveryAddressYes);
-        deliveryAddressGroup.add(deliveryAddressNo);
-        JPanel deliveryOptions = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        deliveryOptions.add(deliveryAddressYes);
-        deliveryOptions.add(deliveryAddressNo);
-        gbcField.gridy = row;
-        formPanel.add(deliveryOptions, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - Street:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryStreetField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryStreetField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - Building Number:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryHouseNumberField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryHouseNumberField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - Apartment Number (Optional):"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryApartmentNumberField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryApartmentNumberField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - City:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryCityField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryCityField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - Postal Code:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryPostalCodeField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryPostalCodeField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - State:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryStateField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryStateField, gbcField);
-        row++;
-
-        gbcLabel.gridy = row;
-        formPanel.add(new JLabel("Delivery Address - Country:"), gbcLabel);
-        gbcField.gridy = row;
-        deliveryCountryField.setPreferredSize(new Dimension(200, 20));
-        formPanel.add(deliveryCountryField, gbcField);
-
-        gbcField.gridy++;
-        gbcField.weighty = 1;
-        formPanel.add(Box.createVerticalGlue(), gbcField);
-
+        addField(formPanel, "Adres dostawy - Ulica:", deliveryStreetField, gbc);
+        addField(formPanel, "Adres dostawy - Numer budynku:", deliveryHouseNumberField, gbc);
+        addField(formPanel, "Adres dostawy - Numer mieszkania (opcjonalne):", deliveryApartmentNumberField, gbc);
+        addField(formPanel, "Adres dostawy - Miasto:", deliveryCityField, gbc);
+        addField(formPanel, "Adres dostawy - Kod pocztowy:", deliveryPostalCodeField, gbc);
+        addField(formPanel, "Adres dostawy - Województwo:", deliveryStateField, gbc);
+        addField(formPanel, "Adres dostawy - Kraj:", deliveryCountryField, gbc);
+        setDeliveryAddressFieldsEnabled(false);
         getContentPane().add(formPanel, BorderLayout.CENTER);
     }
 
 
 
-    private GridBagConstraints createGbc(int x, int y, int weightx) {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = x;
-        gbc.gridy = y;
+    private void addDeliveryAddressRadioBtns(JPanel panel, GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(2, 2, 2, 2);
-        gbc.weightx = weightx;
-        return gbc;
-    }
+        panel.add(new JLabel("Inny adres dostawy:"), gbc);
 
-    public void addDeliveryOptionToForm() {
         deliveryAddressGroup.add(deliveryAddressYes);
         deliveryAddressGroup.add(deliveryAddressNo);
+        JPanel deliveryOptions = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        deliveryOptions.add(deliveryAddressYes);
+        deliveryOptions.add(deliveryAddressNo);
 
-        JPanel deliveryOptionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        deliveryOptionPanel.add(new JLabel("Inny adres dostawy: "));
-        deliveryOptionPanel.add(deliveryAddressYes);
-        deliveryOptionPanel.add(deliveryAddressNo);
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
+        panel.add(deliveryOptions, gbc);
 
-        getContentPane().add(deliveryOptionPanel, BorderLayout.NORTH);
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy++;
 
-        deliveryAddressPanel.setVisible(false);
-    }
-
-
-
-    public void addDeliveryAddressFields() {
-        deliveryAddressPanel.add(new JLabel("Delivery Address - Street:"));
-        deliveryAddressPanel.add(deliveryStreetField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - Building Number:"));
-        deliveryAddressPanel.add(deliveryHouseNumberField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - Apartment Number (Optional):"));
-        deliveryAddressPanel.add(deliveryApartmentNumberField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - City:"));
-        deliveryAddressPanel.add(deliveryCityField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - Postal Code:"));
-        deliveryAddressPanel.add(deliveryPostalCodeField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - State:"));
-        deliveryAddressPanel.add(deliveryStateField);
-
-        deliveryAddressPanel.add(new JLabel("Delivery Address - Country:"));
-        deliveryAddressPanel.add(deliveryCountryField);
-
-        getContentPane().add(deliveryAddressPanel, BorderLayout.EAST);
-        deliveryAddressPanel.setVisible(false); // Domyslnie ukryte
     }
 
     public void clearFormFields() {
@@ -357,6 +198,16 @@ public class CustomerFormView extends AbstractFormView {
         deliveryPostalCodeField.setText("");
         deliveryStateField.setText("");
         deliveryCountryField.setText("");
+    }
+
+    public void setDeliveryAddressFieldsEnabled(boolean enabled) {
+        deliveryStreetField.setEnabled(enabled);
+        deliveryHouseNumberField.setEnabled(enabled);
+        deliveryApartmentNumberField.setEnabled(enabled);
+        deliveryCityField.setEnabled(enabled);
+        deliveryPostalCodeField.setEnabled(enabled);
+        deliveryStateField.setEnabled(enabled);
+        deliveryCountryField.setEnabled(enabled);
     }
 
     public void showDeliveryPanelYes(ActionListener actionListener) {

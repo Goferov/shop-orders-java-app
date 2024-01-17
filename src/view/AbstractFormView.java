@@ -22,6 +22,16 @@ public abstract class AbstractFormView extends JDialog {
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
     }
 
+
+    protected void addField(JPanel panel, String label, JTextField field, GridBagConstraints gbc) {
+        panel.add(new JLabel(label), gbc);
+        gbc.gridx++;
+        field.setPreferredSize(new Dimension(200, 20));
+        panel.add(field, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+    }
+
     protected abstract void addFieldsToForm();
     public abstract void clearFormFields();
 

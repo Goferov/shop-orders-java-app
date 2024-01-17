@@ -82,4 +82,6 @@ public class CustomerView extends AbstractView {
         minOrderValueField.setPreferredSize(new Dimension(100, minOrderValueField.getPreferredSize().height));
     }
 
+
+
 }
