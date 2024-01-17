@@ -104,20 +104,23 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         if (!ValidatorUtil.validateTextField(form.getCompanyField().getText()) && !form.getNipField().getText().isEmpty()) {
             errorMsg.append("Nazwa firmy jest wymagana, gdy podany jest NIP.\n");
             form.getCompanyField().setBackground(Color.PINK);
-        } else {
+        }
+        else {
             form.getCompanyField().setBackground(Color.WHITE);
         }
 
         if(!ValidatorUtil.validateNIP(form.getNipField().getText())) {
             errorMsg.append("NIP jest niepoprawny.\n");
-        }else {
+        }
+        else {
             form.getNipField().setBackground(Color.WHITE);
         }
 
         if (!ValidatorUtil.validateTextField(form.getNipField().getText()) && !form.getCompanyField().getText().isEmpty()) {
             errorMsg.append("NIP jest wymagany, gdy podana jest nazwa firmy.\n");
             form.getNipField().setBackground(Color.PINK);
-        } else {
+        }
+        else {
             form.getNipField().setBackground(Color.WHITE);
         }
 

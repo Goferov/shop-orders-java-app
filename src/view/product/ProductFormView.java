@@ -24,65 +24,78 @@ public class ProductFormView extends AbstractFormView {
         setLocationRelativeTo(parent);
     }
 
-    public String getNameField() {
-        return nameField.getText();
+    public JTextField getNameField() {
+        return nameField;
     }
 
-    public String getDescriptionArea() {
-        return descriptionArea.getText();
+    public JTextArea getDescriptionArea() {
+        return descriptionArea;
     }
 
-    public String getSkuField() {
-        return skuField.getText();
+    public JTextField getSkuField() {
+        return skuField;
     }
 
-    public String getNetPriceField() {
-        return netPriceField.getText();
+    public JTextField getNetPriceField() {
+        return netPriceField;
     }
 
-    public String getTaxField() {
-        return taxField.getText();
+    public JTextField getTaxField() {
+        return taxField;
     }
 
-    public String getLengthField() {
-        return lengthField.getText();
+    public JTextField getLengthField() {
+        return lengthField;
     }
 
-    public String getWidthField() {
-        return widthField.getText();
+    public JTextField getWidthField() {
+        return widthField;
     }
 
-    public String getHeightField() {
-        return heightField.getText();
+    public JTextField getHeightField() {
+        return heightField;
     }
 
-    public String getWeightField() {
-        return weightField.getText();
+    public JTextField getWeightField() {
+        return weightField;
     }
 
     @Override
     protected void addFieldsToForm() {
-        JPanel formPanel = new JPanel(new GridLayout(0, 2));
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
+        JScrollPane descriptionScrollPane = new JScrollPane(descriptionArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.weightx = 1.0;
 
-        formPanel.add(new JLabel("Nazwa:"));
-        formPanel.add(nameField);
-        formPanel.add(new JLabel("Opis (opcjonalnie):"));
-        formPanel.add(descriptionArea);
-        formPanel.add(new JScrollPane(descriptionArea));
-        formPanel.add(new JLabel("SKU:"));
-        formPanel.add(skuField);
-        formPanel.add(new JLabel("Cena NETTO:"));
-        formPanel.add(netPriceField);
-        formPanel.add(new JLabel("Podatek %:"));
-        formPanel.add(taxField);
-        formPanel.add(new JLabel("Długość cm (opcjonalnie):"));
-        formPanel.add(lengthField);
-        formPanel.add(new JLabel("Szerokość cm (opcjonalnie):"));
-        formPanel.add(widthField);
-        formPanel.add(new JLabel("Wysokość cm (opcjonalnie):"));
-        formPanel.add(heightField);
-        formPanel.add(new JLabel("Waga kg (opcjonalnie):"));
-        formPanel.add(weightField);
+
+
+        addField(formPanel, "Nazwa:", nameField, gbc);
+        descriptionScrollPane.setPreferredSize(new Dimension(200, 100)); // szerokość x wysokość
+
+        addField(formPanel, "Opis (opcjonalnie):", descriptionScrollPane, gbc); // Specjalne traktowanie dla JTextArea z JScrollPane
+
+        addField(formPanel, "SKU:", skuField, gbc);
+
+        addField(formPanel, "Cena NETTO:", netPriceField, gbc);
+
+        addField(formPanel, "Podatek %:", taxField, gbc);
+
+        addField(formPanel, "Długość cm (opcjonalnie):", lengthField, gbc);
+
+        addField(formPanel, "Szerokość cm (opcjonalnie):", widthField, gbc);
+
+        addField(formPanel, "Wysokość cm (opcjonalnie):", heightField, gbc);
+
+        addField(formPanel, "Waga kg (opcjonalnie):", weightField, gbc);
         getContentPane().add(formPanel, BorderLayout.CENTER);
     }
 
