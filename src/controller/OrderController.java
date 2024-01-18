@@ -106,10 +106,12 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
     @Override
     protected Order create() {
+        List<ItemsList> orderItems = new ArrayList<>(itemsList);
+
         return new Order(
                 generateNextId(),
                 orderDate,
-                itemsList,
+                orderItems,
                 selectedCustomer,
                 createAddress()
         );
