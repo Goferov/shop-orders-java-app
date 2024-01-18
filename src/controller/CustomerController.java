@@ -33,16 +33,7 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         view.addActionToResetButton(e -> resetFilter());
     }
 
-    private void setDeliveryAddressFields(boolean enable) {
-        form.setDeliveryAddressFieldsEnabled(enable);
-        if(!enable) {
-            resetDeliveryAddressFieldsColor();
-        }
-    }
 
-    private List<Order> getOrders() {
-        return FileUtil.loadFromFile("orders.dat");
-    }
 
     @Override
     protected void showDetails(Customer element) {
@@ -159,6 +150,17 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
             validateAndColorField(form.getDeliveryStateField(), "Adres dostawy - Województwo jest wymagane.\n");
             validateAndColorField(form.getDeliveryCountryField(), "Adres dostawy - Kraj jest wymagany.\n");
         }
+    }
+
+    private void setDeliveryAddressFields(boolean enable) {
+        form.setDeliveryAddressFieldsEnabled(enable);
+        if(!enable) {
+            resetDeliveryAddressFieldsColor();
+        }
+    }
+
+    private List<Order> getOrders() {
+        return FileUtil.loadFromFile("orders.dat");
     }
 
 

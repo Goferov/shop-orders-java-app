@@ -40,13 +40,7 @@ public class ProductController extends AbstractController <Product, ProductView,
 
     }
 
-    private void search(String str) {
-        if (str.isEmpty()) {
-            view.getSorter().setRowFilter(null);
-        } else {
-            view.getSorter().setRowFilter(RowFilter.regexFilter("(?i)" + str, 1));
-        }
-    }
+
 
     @Override
     protected void showDetails(Product element) {
@@ -103,17 +97,7 @@ public class ProductController extends AbstractController <Product, ProductView,
         );
     }
 
-    private Dimensions createDimensions(String lengthStr, String widthStr, String heightStr) {
-        if (!lengthStr.isEmpty() && !widthStr.isEmpty() && !heightStr.isEmpty()) {
-            double length = Double.parseDouble(lengthStr);
-            double width = Double.parseDouble(widthStr);
-            double height = Double.parseDouble(heightStr);
-            if (length > 0 && width > 0 && height > 0) {
-                return new Dimensions(length, width, height);
-            }
-        }
-        return null;
-    }
+
 
     @Override
     protected void validateFormFields() {
@@ -129,6 +113,26 @@ public class ProductController extends AbstractController <Product, ProductView,
 
         int weightValidationResult = ValidatorUtil.validateWeight(form.getWeightField().getText());
         validateWeightField(weightValidationResult);
+    }
+
+    private void search(String str) {
+        if (str.isEmpty()) {
+            view.getSorter().setRowFilter(null);
+        } else {
+            view.getSorter().setRowFilter(RowFilter.regexFilter("(?i)" + str, 1));
+        }
+    }
+
+    private Dimensions createDimensions(String lengthStr, String widthStr, String heightStr) {
+        if (!lengthStr.isEmpty() && !widthStr.isEmpty() && !heightStr.isEmpty()) {
+            double length = Double.parseDouble(lengthStr);
+            double width = Double.parseDouble(widthStr);
+            double height = Double.parseDouble(heightStr);
+            if (length > 0 && width > 0 && height > 0) {
+                return new Dimensions(length, width, height);
+            }
+        }
+        return null;
     }
 
     private void validatePriceField() {

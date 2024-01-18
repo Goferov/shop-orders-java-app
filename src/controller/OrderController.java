@@ -116,17 +116,7 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     }
 
 
-    private Address createAddress() {
-        return new Address(
-                form.getDeliveryStreetField().getText(),
-                form.getDeliveryHouseNumberField().getText(),
-                form.getDeliveryApartmentNumberField().getText(),
-                form.getDeliveryCityField().getText(),
-                form.getDeliveryPostalCodeField().getText(),
-                form.getDeliveryStateField().getText(),
-                form.getDeliveryCountryField().getText()
-        );
-    }
+
 
     @Override
     protected void validateFormFields() {
@@ -163,6 +153,18 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         }
 
         validateAndProcessProductTable();
+    }
+
+    private Address createAddress() {
+        return new Address(
+                form.getDeliveryStreetField().getText(),
+                form.getDeliveryHouseNumberField().getText(),
+                form.getDeliveryApartmentNumberField().getText(),
+                form.getDeliveryCityField().getText(),
+                form.getDeliveryPostalCodeField().getText(),
+                form.getDeliveryStateField().getText(),
+                form.getDeliveryCountryField().getText()
+        );
     }
 
     private void validateAndProcessProductTable() {

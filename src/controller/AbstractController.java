@@ -44,12 +44,7 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
         });
     }
 
-    private void loadFromFile() {
-        dataList = FileUtil.loadFromFile(dataFile);
-        for(T element : dataList) {
-            view.addToView(element);
-        }
-    }
+
 
     protected int generateNextId() {
         int maxId = dataList.stream().mapToInt(T::getId).max().orElse(0);
@@ -103,6 +98,13 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
             dataList.removeIf(c -> c.getId().equals(selectedCustomer));
             view.removeFromView(selectedCustomer);
             saveToFile();
+        }
+    }
+
+    private void loadFromFile() {
+        dataList = FileUtil.loadFromFile(dataFile);
+        for(T element : dataList) {
+            view.addToView(element);
         }
     }
 
