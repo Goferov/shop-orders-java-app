@@ -7,15 +7,6 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 public class ValidatorUtil {
-    public static boolean validateId(String id) {
-        try {
-            Integer.parseInt(id);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     public static boolean validateNIP(String nip) {
         if (nip == null || nip.isEmpty()) {
             return true;
@@ -86,19 +77,6 @@ public class ValidatorUtil {
             return 3;
         } catch (NumberFormatException e) {
             return 2;
-        }
-    }
-
-    public static boolean validateDate(String date, String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        sdf.setLenient(false);
-
-        try {
-            sdf.parse(date);
-            return true;
-        }
-        catch (Exception e) {
-            return false;
         }
     }
 }
