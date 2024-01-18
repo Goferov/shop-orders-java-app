@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 
 public class CustomerView extends AbstractView {
 
-    private SimpleDateFormat dataFormatter = new SimpleDateFormat("dd-MM-yyyy");
     private JFormattedTextField startDateField = DateTimeUtil.createTextFieldWithDataFormat();
     private JFormattedTextField endDateField = DateTimeUtil.createTextFieldWithDataFormat();;
     private JTextField minOrderValueField = new JTextField();

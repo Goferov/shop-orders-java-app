@@ -158,10 +158,6 @@ public class OrderFormView extends AbstractFormView {
         dialog.setVisible(true);
     }
 
-    public void addActionToCustomerList(ActionListener actionListener) {
-        customerComboBox.addActionListener(actionListener);
-    }
-
     public void addActionToAddButton(ActionListener actionListener) {
         addButton.addActionListener(actionListener);
     }
