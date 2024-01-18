@@ -43,6 +43,7 @@ public class Product extends AbstractModel {
     public BigDecimal getGrossPrice() {
         return grossPrice;
     }
+
     public int getTax() {
         return tax;
     }
@@ -54,4 +55,6 @@ public class Product extends AbstractModel {
     public Double getWeight() {
         return weight;
     }
+
+
 }

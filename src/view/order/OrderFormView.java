@@ -83,37 +83,34 @@ public class OrderFormView extends AbstractFormView {
         return deliveryCountryField;
     }
 
-    public String getOrderDateField() {
-        return orderDateField.getText();
+    public JTextField getOrderDateField() {
+        return orderDateField;
     }
 
     @Override
     protected void addFieldsToForm() {
-        JPanel formPanel = new JPanel(new GridLayout(0, 2));
-        formPanel.add(new JLabel("Data złożenia zamówienia:"));
-        formPanel.add(orderDateField);
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
-        formPanel.add(new JLabel("Klient:"));
+        addField(formPanel, "Data złożenia zamówienia::", orderDateField, gbc);
+        addField(formPanel, "Klient:", customerComboBox, gbc);
+        addField(formPanel, "Adres dostawy - Ulica:", deliveryStreetField, gbc);
+        addField(formPanel, "Adres dostawy - Numer domu:", deliveryHouseNumberField, gbc);
+        addField(formPanel, "Adres dostawy - Numer mieszkania:", deliveryApartmentNumberField, gbc);
+        addField(formPanel, "Adres dostawy - Miejscowość:", deliveryCityField, gbc);
+        addField(formPanel, "Adres dostawy - Kod pocztowy:", deliveryPostalCodeField, gbc);
+        addField(formPanel, "Adres dostawy - Województwo:", deliveryStateField, gbc);
+        addField(formPanel, "Adres dostawy - Państwo:", deliveryCountryField, gbc);
 
-        formPanel.add(customerComboBox);
-
-        formPanel.add(new JLabel("Adres dostawy - Street:"));
-        formPanel.add(deliveryStreetField);
-        formPanel.add(new JLabel("Adres dostawy - Building Number:"));
-        formPanel.add(deliveryHouseNumberField);
-        formPanel.add(new JLabel("Adres dostawy - Apartment Number (Optional):"));
-        formPanel.add(deliveryApartmentNumberField);
-        formPanel.add(new JLabel("Adres dostawy - City:"));
-        formPanel.add(deliveryCityField);
-        formPanel.add(new JLabel("Adres dostawy - Postal Code:"));
-        formPanel.add(deliveryPostalCodeField);
-        formPanel.add(new JLabel("Adres dostawy - State:"));
-        formPanel.add(deliveryStateField);
-        formPanel.add(new JLabel("Adres dostawy - Country:"));
-        formPanel.add(deliveryCountryField);
         getContentPane().add(formPanel, BorderLayout.CENTER);
         addProductTableToView();
-
+        productComboBox.setPreferredSize(new Dimension(350, 20));
     }
 
     private void addProductTableToView() {
@@ -146,6 +143,8 @@ public class OrderFormView extends AbstractFormView {
         deliveryPostalCodeField.setText("");
         deliveryStateField.setText("");
         deliveryCountryField.setText("");
+        orderDateField.setText("");
+        productTableModel.setRowCount(0);
     }
 
     private void createDialogWithProductComboBox() {

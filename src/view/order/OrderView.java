@@ -51,18 +51,59 @@ public class OrderView extends AbstractView {
         minOrderValueField.setPreferredSize(new Dimension(100, minOrderValueField.getPreferredSize().height));
         maxOrderValueField.setPreferredSize(new Dimension(100, maxOrderValueField.getPreferredSize().height));
 
-        JPanel filterPanel = new JPanel();
-        filterPanel.add(customerComboBox);
-        filterPanel.add(startDateField);
-        filterPanel.add(endDateField);
-        filterPanel.add(minOrderValueField);
-        filterPanel.add(maxOrderValueField);
-        filterPanel.add(filterButton);
-        filterPanel.add(resetButton);
-        add(filterPanel, BorderLayout.NORTH);
+        addFiltersToView();
 
         dataFormatter.setLenient(false);
     }
+
+    private void addFiltersToView() {
+        JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
+
+        JPanel clientPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        clientPanel.add(new JLabel("Klient:"));
+        clientPanel.add(customerComboBox);
+
+
+        JPanel startDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        startDatePanel.add(new JLabel("Data rozpoczęcia:"));
+        startDatePanel.add(startDateField);
+
+        JPanel endDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        endDatePanel.add(new JLabel("Data zakończenia:"));
+        endDatePanel.add(endDateField);
+
+        JPanel minOrderValuePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        minOrderValuePanel.add(new JLabel("Min. wartość zamówienia:"));
+        minOrderValuePanel.add(minOrderValueField);
+
+        JPanel maxOrderValuePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        maxOrderValuePanel.add(new JLabel("Max. wartość zamówienia:"));
+        maxOrderValuePanel.add(maxOrderValueField);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonsPanel.add(filterButton);
+        buttonsPanel.add(resetButton);
+
+        filterPanel.add(clientPanel);
+        filterPanel.add(startDatePanel);
+        filterPanel.add(endDatePanel);
+        filterPanel.add(maxOrderValuePanel);
+        filterPanel.add(minOrderValuePanel);
+        filterPanel.add(buttonsPanel);
+
+        JPanel centeredFilterPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.CENTER;
+        centeredFilterPanel.add(filterPanel, gbc);
+
+        add(centeredFilterPanel, BorderLayout.NORTH);
+    }
+
     @Override
     public void addToView(Object o) {
         Order order  = (Order) o;

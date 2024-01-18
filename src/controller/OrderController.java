@@ -13,10 +13,12 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 public class OrderController extends AbstractController<Order, OrderView, OrderFormView> {
 
@@ -29,7 +31,6 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
     protected OrderController(OrderView view, OrderFormView orderFormView) {
         super(view, orderFormView, "orders.dat");
-//        form.addActionToCustomerList(e -> updateDeliveryAddressFields());
         form.addActionToRemoveButton(e -> removeProductFromOrderList());
         form.addActionToSelectButton(e -> addProductsToTable());
         form.addActionToProductTableModel(this::calculateTotalSum);
@@ -59,6 +60,20 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
         view.addActionToFilterButton(e -> search());
         view.addActionToResetButton(e -> resetFilter());
+
+        form.getProductComboBox().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof Product) {
+                    Product product = (Product) value;
+                    setText(product.getName());
+                }
+
+                return this;
+            }
+        });
     }
 
     @Override
@@ -118,38 +133,33 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             sdf.setLenient(false);
-            orderDate = sdf.parse(form.getOrderDateField());
-            System.out.println(orderDate);
+            orderDate = sdf.parse(form.getOrderDateField().getText());
+            form.getOrderDateField().setBackground(Color.white);
         } catch (Exception e) {
             errorMsg.append("Data powinna być zapisana w formacie dd-MM-yyyy.\n");
+            form.getOrderDateField().setBackground(Color.pink);
         }
 
         if(selectedCustomer == null) {
             errorMsg.append("Nie wybrano klienta.\n");
+            form.getCustomerComboBox().setBackground(Color.pink);
+        }
+        else {
+            form.getCustomerComboBox().setBackground(Color.white);
         }
 
-        if (!ValidatorUtil.validateTextField(form.getDeliveryStreetField().getText())) {
-            errorMsg.append("Adres dostawy - nazwa ulicy jest wymagana.\n");
-        }
+        validateAndColorField(form.getDeliveryStreetField(), "Adres dostawy - nazwa ulicy jest wymagana.\n");
+        validateAndColorField(form.getDeliveryHouseNumberField(), "Adres dostawy - numer budynku jest wymagany.\n");
+        validateAndColorField(form.getDeliveryCityField(), "Adres dostawy - miejscowość jest wymagana.\n");
+        validateAndColorField(form.getDeliveryStateField(), "Adres dostawy - województwo jest wymagane.\n");
+        validateAndColorField(form.getDeliveryCountryField(), "Adres dostawy - kraj jest wymagany.\n");
 
-        if (!ValidatorUtil.validateTextField(form.getDeliveryHouseNumberField().getText())) {
-            errorMsg.append("Adres dostawy - numer budynku jest wymagany.\n");
+        if(!ValidatorUtil.validatePostalCode(form.getDeliveryPostalCodeField().getText())) {
+            errorMsg.append("Adres dostawy - Kod pocztowy jest niepoprawny.\n");
+            form.getDeliveryPostalCodeField().setBackground(Color.PINK);
         }
-
-        if (!ValidatorUtil.validateTextField(form.getDeliveryCityField().getText())) {
-            errorMsg.append("Adres dostawy - miejscowość jest wymagana.\n");
-        }
-
-        if (!ValidatorUtil.validatePostalCode(form.getDeliveryPostalCodeField().getText())) {
-            errorMsg.append("Adres dostawy - kod pocztowy jest niepoprawny.\n");
-        }
-
-        if (!ValidatorUtil.validateTextField(form.getDeliveryStateField().getText())) {
-            errorMsg.append("Adres dostawy - województwo jest wymagane.\n");
-        }
-
-        if (!ValidatorUtil.validateTextField(form.getDeliveryCountryField().getText())) {
-            errorMsg.append("Adres dostawy - kraj jest wymagany.\n");
+        else {
+            form.getDeliveryPostalCodeField().setBackground(Color.WHITE);
         }
 
         validateAndProcessProductTable();
@@ -158,6 +168,12 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
     private void validateAndProcessProductTable() {
         DefaultTableModel tableModel = form.getproductTableModel();
         itemsList.clear();
+
+        if (tableModel.getRowCount() == 0) {
+            errorMsg.append("Lista produktów jest pusta. Dodaj przynajmniej jeden produkt.\n");
+            return;
+        }
+
         for (int row = 0; row < tableModel.getRowCount(); row++) {
             try {
                 Integer productId = (Integer) tableModel.getValueAt(row, 0);;
@@ -255,14 +271,6 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
         return null;
     }
 
-    private void addProductsToComboBox() {
-        form.getProductComboBox().removeAllItems();
-        List<Product> prods = getProducts();
-        for (Product product : prods) {
-            form.getProductComboBox().addItem(product);
-        }
-    }
-
     private void addProductsToTable() {
         Product selectedProduct = (Product) form.getProductComboBox().getSelectedItem();
         if (selectedProduct != null) {
@@ -300,12 +308,6 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
     private BigDecimal calculateTotal(BigDecimal price, int quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
-
-    }
-
-    private BigDecimal priceAfterDiscount(BigDecimal price, int discount) {
-        BigDecimal rabatDecimal = BigDecimal.valueOf(discount).divide(BigDecimal.valueOf(100));
-        return price.multiply(BigDecimal.valueOf(discount)).multiply(BigDecimal.ONE.subtract(rabatDecimal));
     }
 
     private void calculateTotalSum(TableModelEvent e) {
@@ -359,20 +361,6 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
                 }
             }
         }
-    }
-
-    private PopupMenuListener customerComboBoxAction() {
-        return new PopupMenuListener() {
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                addCustomersToFormComboBox(form.getCustomerComboBox());
-            }
-
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                updateDeliveryAddressFields();
-            }
-
-            public void popupMenuCanceled(PopupMenuEvent e) {}
-        };
     }
 
     private void search() {

@@ -27,7 +27,7 @@ public abstract class AbstractFormView extends JDialog {
         panel.add(new JLabel(label), gbc);
         gbc.gridx++;
         if (field instanceof JTextField) {
-            ((JTextField) field).setPreferredSize(new Dimension(200, 20));
+            ((JTextField) field).setPreferredSize(new Dimension(250, 20));
         }
         panel.add(field, gbc);
         gbc.gridx = 0;
