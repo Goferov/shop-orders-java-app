@@ -3,9 +3,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .idea
-customers.dat
-products.dat
-orders.dat
+#customers.dat
+#products.dat
+#orders.dat
 
 ### Eclipse ###
 .apt_generated

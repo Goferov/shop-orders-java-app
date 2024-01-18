@@ -1,5 +1,6 @@
 package model;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 public class Order extends AbstractModel {
@@ -39,13 +40,13 @@ public class Order extends AbstractModel {
             BigDecimal itemTotal = item.getGrossTotal();
 
             if (item.getDiscount() > 0) {
-                BigDecimal discount = BigDecimal.valueOf(item.getDiscount()).divide(new BigDecimal(100));
+                BigDecimal discount = BigDecimal.valueOf(item.getDiscount()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 itemTotal = itemTotal.subtract(itemTotal.multiply(discount));
             }
 
             total = total.add(itemTotal);
         }
 
-        return total;
+        return total.setScale(2, RoundingMode.HALF_UP);
     }
 }

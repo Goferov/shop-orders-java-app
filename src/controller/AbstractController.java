@@ -19,7 +19,7 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
     protected final TForm form;
     private final String dataFile;
     private List<T> dataList;
-    private static int currentId = 0;
+    private int currentId = 0;
     protected boolean isValidate = true;
     protected StringBuilder errorMsg = new StringBuilder();
 

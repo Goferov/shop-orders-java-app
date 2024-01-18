@@ -11,6 +11,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class ProductController extends AbstractController <Product, ProductView, ProductFormView>{
 
@@ -79,7 +80,10 @@ public class ProductController extends AbstractController <Product, ProductView,
     protected Product create() {
         BigDecimal netPrice = new BigDecimal(form.getNetPriceField().getText());
         int tax = Integer.parseInt(form.getTaxField().getText());
-        BigDecimal grossPrice = netPrice.add(netPrice.multiply( BigDecimal.valueOf(tax).divide(new BigDecimal("100"))));
+        BigDecimal grossPrice = netPrice.add(
+                netPrice.multiply(BigDecimal.valueOf(tax).divide(new BigDecimal("100")))
+        );
+        grossPrice = grossPrice.setScale(2, RoundingMode.HALF_UP);
 
         Dimensions dimensions = createDimensions(form.getLengthField().getText(), form.getWidthField().getText(), form.getHeightField().getText());
 
