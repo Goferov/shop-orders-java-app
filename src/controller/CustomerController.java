@@ -205,7 +205,8 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
                 customerOrderTotalMap.merge(customer, totalValue, BigDecimal::add));
 
         BigDecimal finalMinOrderValue = minOrderValue;
-        Set<Customer> customersMeetingCriteria = customerOrderTotalMap.entrySet().stream()
+        Set<Customer> customersMeetingCriteria = ordersMap.entrySet().stream()
+                .filter(entry -> entry.getValue().compareTo(BigDecimal.ZERO) > 0) // Dodatkowe sprawdzenie, czy klient złożył jakiekolwiek zamówienia
                 .filter(entry -> (finalMinOrderValue == null || entry.getValue().compareTo(finalMinOrderValue) >= 0))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
