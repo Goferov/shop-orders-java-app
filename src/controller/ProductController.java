@@ -46,35 +46,45 @@ public class ProductController extends AbstractController <Product, ProductView,
 
     @Override
     protected void showDetails(Product element) {
-        if(element != null) {
-            StringBuilder details = new StringBuilder();
-            details.append("Nazwa: ").append(element.getName()).append("\n\n");
-            details.append("Opis: \n").append(element.getDescription()).append("\n\n");
-            details.append("SKU: ").append(element.getSku()).append("\n\n");
-            details.append("Netto: ").append(element.getNetPrice()).append(" zł\n\n");
-            details.append("Podatek: ").append(element.getTax()).append("%\n\n");
-            details.append("Brutto:\n").append(element.getGrossPrice()).append(" zł\n\n");
-            details.append("Waga: ");
-            if(element.getWeight() != null) {
-                details.append(element.getWeight()).append(" kg\n\n");
-            }
-            else {
-                details.append("Brak\n\n");
-            }
+        if (element != null) {
+            JTextArea textArea = new JTextArea(15, 50);
+            textArea.setText(createProductDetailsText(element));
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setCaretPosition(0);
 
-            details.append("Wymiary:\n");
-            if(element.getDimensions() != null) {
-                details
-                        .append("Długość: ").append(element.getDimensions().getLength()).append(" cm\n")
-                        .append("Szerokość: ").append(element.getDimensions().getWidth()).append(" cm\n")
-                        .append("Wysokość: ").append(element.getDimensions().getHeight()).append(" cm\n");
-            }
-            else {
-                details.append("Brak\n");
-            }
-
-            JOptionPane.showMessageDialog(view, details, "Szczegóły produktu", JOptionPane.INFORMATION_MESSAGE);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(view, scrollPane, "Szczegóły produktu", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private String createProductDetailsText(Product element) {
+        StringBuilder details = new StringBuilder();
+        details.append("Nazwa: ").append(element.getName()).append("\n\n");
+        details.append("Opis: \n").append(element.getDescription()).append("\n\n");
+        details.append("SKU: ").append(element.getSku()).append("\n\n");
+        details.append("Netto: ").append(element.getNetPrice()).append(" zł\n\n");
+        details.append("Podatek: ").append(element.getTax()).append("%\n\n");
+        details.append("Brutto:\n").append(element.getGrossPrice()).append(" zł\n\n");
+
+        details.append("Waga: ");
+        if (element.getWeight() != null) {
+            details.append(element.getWeight()).append(" kg\n\n");
+        } else {
+            details.append("Brak\n\n");
+        }
+
+        details.append("Wymiary:\n");
+        if (element.getDimensions() != null) {
+            details.append("Długość: ").append(element.getDimensions().getLength()).append(" cm\n")
+                    .append("Szerokość: ").append(element.getDimensions().getWidth()).append(" cm\n")
+                    .append("Wysokość: ").append(element.getDimensions().getHeight()).append(" cm\n");
+        } else {
+            details.append("Brak\n");
+        }
+
+        return details.toString();
     }
 
     @Override
