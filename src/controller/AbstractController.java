@@ -10,7 +10,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +46,9 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
         });
     }
 
-
+    protected List<T> getDataList() {
+        return dataList;
+    }
 
     protected int generateNextId() {
         int maxId = dataList.stream().mapToInt(T::getId).max().orElse(0);
@@ -55,6 +59,17 @@ public abstract class AbstractController<T extends AbstractModel, TView extends 
     protected T findById(Integer id) {
         Optional<T> findedElem = dataList.stream().filter(c -> c.getId().equals(id)).findFirst();
         return findedElem.orElse(null);
+    }
+
+    protected void setSorterToBigDecimalValue(int columnIndex) {
+        view.getSorter().setComparator(columnIndex, new Comparator<BigDecimal>() {
+            @Override
+            public int compare(BigDecimal o1, BigDecimal o2) {
+                if (o1 == null) return (o2 == null) ? 0 : -1;
+                if (o2 == null) return 1;
+                return o1.compareTo(o2);
+            }
+        });
     }
 
     protected abstract void showDetails(T element);

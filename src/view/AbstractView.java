@@ -8,6 +8,7 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.math.BigDecimal;
 
 public abstract class AbstractView extends JPanel {
     protected JButton addButton = new JButton("Dodaj");;
@@ -16,10 +17,18 @@ public abstract class AbstractView extends JPanel {
     protected JButton resetButton = new JButton("Reset");
     protected JTable table;
     public DefaultTableModel tableModel;
-    TableRowSorter<TableModel> sorter;
+    protected TableRowSorter<TableModel> sorter;
 
     public AbstractView(String[] columnNames) {
-        tableModel = new DefaultTableModel(columnNames, 0);
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                if (column == findColumn("Suma Zamówień")) {
+                    return BigDecimal.class;
+                }
+                return super.getColumnClass(column);
+            }
+        };
         table = new JTable(tableModel);
         sorter = new TableRowSorter<>(table.getModel());
         table.setRowSorter(sorter);

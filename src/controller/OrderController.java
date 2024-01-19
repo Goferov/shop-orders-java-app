@@ -74,7 +74,9 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
                 return this;
             }
         });
+        setSorterToBigDecimalValue(2);
     }
+
 
     @Override
     protected void showDetails(Order element) {

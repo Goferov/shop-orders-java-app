@@ -6,7 +6,9 @@ import view.AbstractView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 
 
 public class CustomerView extends AbstractView {

@@ -16,10 +16,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomerController extends AbstractController<Customer, CustomerView, CustomerFormView> {
@@ -184,7 +182,14 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
         if (!startFilter) {
             return ;
         }
-        Map<Customer, BigDecimal> customerOrderTotalMap = getOrders().stream()
+
+        Map<Customer, BigDecimal> customerOrderTotalMap = getDataList().stream()
+                .collect(Collectors.toMap(
+                        customer -> customer,
+                        customer -> BigDecimal.ZERO
+                ));
+
+        Map<Customer, BigDecimal> ordersMap = getOrders().stream()
                 .filter(order -> (startDate == null || !order.getDate().before(startDate)) &&
                         (endDate == null || !order.getDate().after(endDate)))
                 .collect(Collectors.groupingBy(
@@ -195,6 +200,9 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
                                 BigDecimal::add
                         )
                 ));
+
+        ordersMap.forEach((customer, totalValue) ->
+                customerOrderTotalMap.merge(customer, totalValue, BigDecimal::add));
 
         BigDecimal finalMinOrderValue = minOrderValue;
         Set<Customer> customersMeetingCriteria = customerOrderTotalMap.entrySet().stream()
@@ -212,6 +220,7 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
                 String clientId = entry.getStringValue(0);
                 Customer clientInRow = findById(Integer.parseInt(clientId));
                 updateTableWithOrderSum(customerOrderTotalMap);
+
                 return customersMeetingCriteria.contains(clientInRow);
             }
         });
@@ -232,6 +241,8 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
 
             model.setValueAt(orderSum, i, model.getColumnCount() - 1);
         }
+        int newColumnIndex = model.getColumnCount() - 1;
+        setSorterToBigDecimalValue(newColumnIndex);
     }
 
     private void removeOrderSumColumn() {

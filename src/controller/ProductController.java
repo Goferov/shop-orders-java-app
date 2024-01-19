@@ -38,7 +38,8 @@ public class ProductController extends AbstractController <Product, ProductView,
                 updateSearch(e);
             }
         });
-
+        setSorterToBigDecimalValue(3);
+        setSorterToBigDecimalValue(4);
     }
 
 
