@@ -99,6 +99,7 @@ public class OrderFormView extends AbstractFormView {
         gbc.gridy = 0;
 
         addField(formPanel, "Data złożenia zamówienia::", orderDateField, gbc);
+        customerComboBox.setPreferredSize(new Dimension(250, 20));
         addField(formPanel, "Klient:", customerComboBox, gbc);
         addField(formPanel, "Adres dostawy - Ulica:", deliveryStreetField, gbc);
         addField(formPanel, "Adres dostawy - Numer domu:", deliveryHouseNumberField, gbc);
