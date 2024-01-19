@@ -80,30 +80,42 @@ public class OrderController extends AbstractController<Order, OrderView, OrderF
 
     @Override
     protected void showDetails(Order element) {
-        if(element != null) {
-            StringBuilder details = new StringBuilder();
+        if (element != null) {
+            JTextArea textArea = new JTextArea(15, 50);
+            textArea.setText(createOrderDetailsText(element));
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setCaretPosition(0);
 
-            details.append("Identyfikator: \n").append(element.getId()).append("\n\n");
-            details.append("Data: \n").append(DateTimeUtil.showDate(element.getDate())).append("\n\n");
-            details.append("Klient: \n").append(element.getClient()).append("\n\n");
-            details.append("Produkty: \n");
-            details.append(String.format("%-10s %-30s %-10s %-10s %-15s %-15s\n", "ID", "Nazwa", "Ilość", "Rabat", "Netto", "Brutto"));
-            details.append("----------------------------------------------------------------------------------------\n");
-            for(ItemsList item : element.getItemsList()) {
-                details.append(String.format("%-10d %-30s %-10d %-10d %-15.2f %-15.2f\n",
-                        item.getId(),
-                        item.getName(),
-                        item.getQuantity(),
-                        item.getDiscount(),
-                        item.getNetTotal(),
-                        item.getGrossTotal()));
-            }
-            details.append("\n");
-            details.append("Cena całkowita: \n").append(element.getOrderTotalPrice()).append(" zł\n\n");
-            details.append("Adres dostawy:\n").append(element.getDeliveryAddress()).append("\n\n");
-
-            JOptionPane.showMessageDialog(view, details, "Szczegóły zamówienia", JOptionPane.INFORMATION_MESSAGE);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(view, scrollPane, "Szczegóły zamówienia", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private String createOrderDetailsText(Order element) {
+        StringBuilder details = new StringBuilder();
+
+        details.append("Identyfikator: \n").append(element.getId()).append("\n\n");
+        details.append("Data: \n").append(DateTimeUtil.showDate(element.getDate())).append("\n\n");
+        details.append("Klient: \n").append(element.getClient()).append("\n\n");
+        details.append("Produkty: \n");
+        details.append(String.format("%-10s %-30s %-10s %-10s %-15s %-15s\n", "ID", "Nazwa", "Ilość", "Rabat", "Netto", "Brutto"));
+        details.append("----------------------------------------------------------------------------------------\n");
+        for (ItemsList item : element.getItemsList()) {
+            details.append(String.format("%-10d %-30s %-10d %-10d %-15.2f %-15.2f\n",
+                    item.getId(),
+                    item.getName(),
+                    item.getQuantity(),
+                    item.getDiscount(),
+                    item.getNetTotal(),
+                    item.getGrossTotal()));
+        }
+        details.append("\n");
+        details.append("Cena całkowita: \n").append(element.getOrderTotalPrice()).append(" zł\n\n");
+        details.append("Adres dostawy:\n").append(element.getDeliveryAddress()).append("\n\n");
+
+        return details.toString();
     }
 
     @Override

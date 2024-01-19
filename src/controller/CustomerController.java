@@ -35,19 +35,31 @@ public class CustomerController extends AbstractController<Customer, CustomerVie
 
     @Override
     protected void showDetails(Customer element) {
-        if(element != null) {
-            StringBuilder details = new StringBuilder();
-            details.append("Imię: ").append(element.getName()).append("\n\n");
-            details.append("Nazwisko: ").append(element.getLastname()).append("\n\n");
-            details.append("Firma: ").append(element.getCompany()).append("\n\n");
-            details.append("NIP: ").append(element.getNip()).append("\n\n");
-            details.append("Adres:\n").append(element.getAddress()).append("\n");
-            details.append("Adres dostawy:\n").append(
-                    element.getDeliveryAddress() != null ? element.getDeliveryAddress() : "Taki sam jak powyżej"
-            ).append("\n\n");
+        if (element != null) {
+            JTextArea textArea = new JTextArea(10, 30);
+            textArea.setText(createCustomerDetailsText(element));
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setCaretPosition(0);
 
-            JOptionPane.showMessageDialog(view, details, "Szczegóły Klienta", JOptionPane.INFORMATION_MESSAGE);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(view, scrollPane, "Szczegóły Klienta", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private String createCustomerDetailsText(Customer element) {
+        StringBuilder details = new StringBuilder();
+        details.append("Imię: ").append(element.getName()).append("\n");
+        details.append("Nazwisko: ").append(element.getLastname()).append("\n");
+        details.append("Firma: ").append(element.getCompany()).append("\n");
+        details.append("NIP: ").append(element.getNip()).append("\n");
+        details.append("Adres:\n").append(element.getAddress()).append("\n");
+        details.append("Adres dostawy:\n").append(
+                element.getDeliveryAddress() != null ? element.getDeliveryAddress() : "Taki sam jak powyżej"
+        ).append("\n");
+
+        return details.toString();
     }
 
     @Override
